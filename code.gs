@@ -16,10 +16,9 @@ const SHEET_NAME = 'Sheet1';
  * @returns {ContentService.TextOutput} A JSON response indicating success or failure.
  */
 function doPost(e) {
-  // Set the CORS header to allow requests from your web app.
-  // Replace 'https://hamdi6416.github.io' with your actual web app URL.
+  // Set the CORS header to allow requests from your specific web app URL.
   const response = ContentService.createTextOutput();
-  response.setHeader('Access-Control-Allow-Origin', '*'); // Use '*' to allow all origins during testing
+  response.setHeader('Access-Control-Allow-Origin', 'https://hamdi6416.github.io');
 
   try {
     // Parse the JSON data sent from the web app.
@@ -57,7 +56,7 @@ function doPost(e) {
  */
 function doGet(e) {
   const response = ContentService.createTextOutput("Hello from the Apps Script backend! This endpoint is for POST requests only.");
-  response.setHeader('Access-Control-Allow-Origin', '*');
+  response.setHeader('Access-Control-Allow-Origin', 'https://hamdi6416.github.io');
   return response;
 }
 
