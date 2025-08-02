@@ -1,839 +1,1696 @@
+I ant find this syncToGoogleSheets() in the current html file!!! and also i want to confirm the new colors i added to the app!!
+
+
+
+So, this is the new live deploy URL: 
+
+
+
+https://script.google.com/macros/s/AKfycbxm79W-bqEmKqgty9CHM3psc-aozvNpFear6JcmKXfCPpIOsWIrZdnWld7n9rpycsFn/exec
+
+
+
+**Please update the file code and provide the final correct one and updated one 
+
+
+
+-------
+
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Client Follow-Up Tracker</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.js"></script>
-    <style>
-        :root {
-            --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --bg-card: rgba(255, 255, 255, 0.95);
-            --text-primary: #333;
-            --text-secondary: #666;
-            --text-tertiary: #777;
-            --border-color: #ddd;
-            --hover-color: #f5f5f5;
-            --accent-red: #ef4444;
-            --accent-orange: #f97316;
-            --accent-blue: #3b82f6;
-            --accent-green: #22c55e;
-            --accent-purple: #a855f7;
-        }
-
-        [data-theme="dark"] {
-            --bg-primary: linear-gradient(135deg, #1a1a1a 0%, #2d1b69 100%);
-            --bg-card: rgba(30, 30, 30, 0.95);
-            --text-primary: #ffffff;
-            --text-secondary: #cccccc;
-            --text-tertiary: #aaaaaa;
-            --border-color: #444;
-            --hover-color: #333;
-            --accent-red: #ef4444;
-            --accent-orange: #f97316;
-            --accent-blue: #3b82f6;
-            --accent-green: #22c55e;
-            --accent-purple: #a855f7;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg-primary);
-            min-height: 100vh;
-            color: var(--text-primary);
-            transition: all 0.3s ease;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .header {
-            background: var(--bg-card);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            border: 2px solid transparent;
-        }
-
-        [data-theme="dark"] .header {
-            border-color: #FFD700;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .header h1 {
-            font-weight: 700;
-            font-size: 2rem;
-            color: var(--text-primary);
-        }
-
-        .theme-toggle {
-            background: var(--accent-purple);
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .theme-toggle:hover {
-            transform: scale(1.1);
-            background: var(--accent-green);
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-            width: 100%;
-        }
-
-        .stat-card {
-            background: #fff;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            text-align: center;
-            border: 2px solid transparent;
-        }
-
-        [data-theme="dark"] .stat-card {
-            background: #2a2a2a;
-            border-color: #FFD700;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.1);
-        }
-
-        .stat-card h3 {
-            font-size: 1rem;
-            color: var(--text-tertiary);
-            margin-bottom: 5px;
-        }
-
-        .stat-card p {
-            font-size: 2rem;
-            font-weight: 700;
-        }
-        
-        .stat-card.due p { color: var(--accent-red); }
-        .stat-card.meetings p { color: var(--accent-orange); }
-        .stat-card.calls p { color: var(--accent-blue); }
-        .stat-card.active p { color: var(--accent-green); }
-        .stat-card.won p { color: var(--accent-purple); }
-        .stat-card.quotations p { color: #FFD700; }
-
-        .dashboard-content {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            margin-bottom: 30px;
-        }
-
-        .client-list {
-            background: var(--bg-card);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.1);
-            flex: 2;
-            min-width: 600px;
-            border: 2px solid transparent;
-        }
-
-        [data-theme="dark"] .client-list {
-            border-color: #FFD700;
-        }
-
-        .todo-section {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            flex: 1;
-            min-width: 300px;
-        }
-
-        .todo-list {
-            background: var(--bg-card);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.1);
-            border: 2px solid transparent;
-        }
-
-        [data-theme="dark"] .todo-list {
-            border-color: #FFD700;
-        }
-
-        .todo-list.hamdi {
-            border-left: 5px solid var(--accent-purple);
-        }
-
-        .todo-list.dina {
-            border-left: 5px solid var(--accent-green);
-        }
-
-        .todo-list h2, .client-list h2 {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            color: var(--text-primary);
-        }
-
-        .task-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: var(--hover-color);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.03);
-            border-left: 5px solid;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .task-item:hover {
-            transform: translateX(5px);
-        }
-        
-        .task-item.high { border-color: var(--accent-red); }
-        .task-item.medium { border-color: var(--accent-orange); }
-        .task-item.low { border-color: var(--accent-green); }
-
-        .task-item .task-info {
-            flex: 1;
-        }
-        
-        .task-item .task-title {
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .task-item .task-meta {
-            font-size: 0.85rem;
-            color: var(--text-tertiary);
-        }
-        
-        .task-item .task-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .task-item button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: var(--text-tertiary);
-            transition: color 0.2s ease;
-        }
-        
-        .task-item button:hover {
-            color: var(--text-primary);
-        }
-
-        .controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        
-        .controls .btn {
-            padding: 10px 15px;
-            border-radius: 10px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .controls .btn-primary {
-            background-color: #6366f1;
-            color: #fff;
-        }
-        
-        .controls .btn-secondary {
-            background-color: #e2e8f0;
-            color: #4a5568;
-        }
-
-        [data-theme="dark"] .controls .btn-secondary {
-            background-color: #444;
-            color: #ccc;
-        }
-        
-        .controls .btn-secondary.small {
-            padding: 8px 12px;
-            font-size: 0.9rem;
-        }
-
-        .controls .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-        }
-
-        .search-bar {
-            flex-grow: 1;
-            padding: 10px 15px;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            font-size: 1rem;
-            background: var(--bg-card);
-            color: var(--text-primary);
-        }
-
-        .sort-buttons {
-            display: flex;
-            gap: 5px;
-            align-items: center;
-        }
-
-        .sort-btn {
-            background: var(--accent-blue);
-            color: white;
-            border: none;
-            padding: 5px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .sort-btn:hover {
-            background: var(--accent-purple);
-            transform: scale(1.1);
-        }
-
-        .client-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        
-        .client-table th, .client-table td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .client-table th {
-            background: var(--hover-color);
-            font-weight: 600;
-            color: var(--text-secondary);
-            cursor: pointer;
-            white-space: nowrap;
-        }
-        
-        .client-table td {
-            background: var(--bg-card);
-            transition: background-color 0.2s ease;
-        }
-
-        .client-table tr:hover td {
-            background-color: var(--hover-color);
-            cursor: pointer;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #fff;
-            text-align: center;
-        }
-
-        .status-badge.active { background-color: var(--accent-green); }
-        .status-badge.cold { background-color: #94a3b8; }
-        .status-badge.closed-won { background-color: var(--accent-purple); }
-        .status-badge.closed-lost { background-color: var(--accent-red); }
-
-        .rep-badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 15px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: #fff;
-            text-align: center;
-        }
-
-        .rep-badge.hamdi { background-color: var(--accent-purple); }
-        .rep-badge.dina { background-color: var(--accent-green); }
-
-        .client-actions {
-            display: flex;
-            gap: 5px;
-        }
-
-        .client-actions .action-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #667eea;
-            opacity: 0.7;
-            transition: opacity 0.2s ease;
-        }
-        
-        .client-actions .action-btn:hover {
-            opacity: 1;
-        }
-
-        /* Modal styling */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(5px);
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background-color: var(--bg-card);
-            padding: 30px;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 600px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-            position: relative;
-            max-height: 80vh;
-            overflow-y: auto;
-            border: 2px solid transparent;
-        }
-
-        [data-theme="dark"] .modal-content {
-            border-color: #FFD700;
-        }
-
-        .modal-content h2 {
-            margin-bottom: 20px;
-            color: var(--text-primary);
-        }
-        
-        .close-button {
-            color: var(--text-tertiary);
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            position: absolute;
-            top: 15px;
-            right: 25px;
-            cursor: pointer;
-            transition: color 0.2s ease;
-        }
-
-        .close-button:hover {
-            color: var(--text-primary);
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            font-size: 1rem;
-            background: var(--bg-card);
-            color: var(--text-primary);
-        }
-
-        .modal-footer {
-            margin-top: 20px;
-            text-align: right;
-        }
-        
-        .modal-footer .btn {
-            padding: 10px 20px;
-            border-radius: 10px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            margin-left: 10px;
-        }
-        
-        .modal-footer .btn-save {
-            background-color: #6366f1;
-            color: #fff;
-        }
-
-        .modal-footer .btn-cancel {
-            background-color: #e2e8f0;
-            color: #4a5568;
-        }
-
-        [data-theme="dark"] .modal-footer .btn-cancel {
-            background-color: #444;
-            color: #ccc;
-        }
-
-        .message-box {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 15px 30px;
-            border-radius: 10px;
-            color: #fff;
-            font-weight: 600;
-            z-index: 2000;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            transition: opacity 0.5s ease-in-out;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .message-box.visible {
-            opacity: 1;
-        }
-
-        .message-box.success { background-color: var(--accent-green); }
-        .message-box.error { background-color: var(--accent-red); }
-        .message-box.warning { background-color: var(--accent-orange); }
-        .message-box.info { background-color: var(--accent-blue); }
-
-        .client-details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .detail-item {
-            background: var(--hover-color);
-            padding: 15px;
-            border-radius: 10px;
-            border-left: 4px solid var(--accent-blue);
-        }
-
-        .detail-item label {
-            font-weight: 600;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .detail-item .value {
-            font-size: 1.1rem;
-            color: var(--text-primary);
-            margin-top: 5px;
-        }
-
-        .notes-section {
-            margin-top: 20px;
-        }
-
-        .notes-section textarea {
-            width: 100%;
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        @media (max-width: 768px) {
-            .dashboard-content {
-                flex-direction: column;
-            }
-            
-            .client-list {
-                min-width: auto;
-            }
-            
-            .todo-section {
-                min-width: auto;
-            }
-            
-            .controls {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .search-bar {
-                margin-bottom: 10px;
-            }
-        }
-    </style>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Client Follow-Up Tracker</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.js"></script>
+
+    <style>
+
+        :root {
+
+            --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+            --bg-card: rgba(255, 255, 255, 0.95);
+
+            --text-primary: #333;
+
+            --text-secondary: #666;
+
+            --text-tertiary: #777;
+
+            --border-color: #ddd;
+
+            --hover-color: #f5f5f5;
+
+            --accent-red: #ef4444;
+
+            --accent-orange: #f97316;
+
+            --accent-blue: #3b82f6;
+
+            --accent-green: #22c55e;
+
+            --accent-purple: #a855f7;
+
+        }
+
+
+
+        [data-theme="dark"] {
+
+            --bg-primary: linear-gradient(135deg, #1a1a1a 0%, #2d1b69 100%);
+
+            --bg-card: rgba(30, 30, 30, 0.95);
+
+            --text-primary: #ffffff;
+
+            --text-secondary: #cccccc;
+
+            --text-tertiary: #aaaaaa;
+
+            --border-color: #444;
+
+            --hover-color: #333;
+
+            --accent-red: #ef4444;
+
+            --accent-orange: #f97316;
+
+            --accent-blue: #3b82f6;
+
+            --accent-green: #22c55e;
+
+            --accent-purple: #a855f7;
+
+        }
+
+
+
+        * {
+
+            margin: 0;
+
+            padding: 0;
+
+            box-sizing: border-box;
+
+        }
+
+
+
+        body {
+
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+            background: var(--bg-primary);
+
+            min-height: 100vh;
+
+            color: var(--text-primary);
+
+            transition: all 0.3s ease;
+
+        }
+
+
+
+        .container {
+
+            max-width: 1400px;
+
+            margin: 0 auto;
+
+            padding: 20px;
+
+        }
+
+
+
+        .header {
+
+            background: var(--bg-card);
+
+            backdrop-filter: blur(10px);
+
+            border-radius: 20px;
+
+            padding: 30px;
+
+            margin-bottom: 30px;
+
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.1);
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            flex-wrap: wrap;
+
+            border: 2px solid transparent;
+
+        }
+
+
+
+        [data-theme="dark"] .header {
+
+            border-color: #FFD700;
+
+        }
+
+
+
+        .header-left {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 20px;
+
+        }
+
+
+
+        .header h1 {
+
+            font-weight: 700;
+
+            font-size: 2rem;
+
+            color: var(--text-primary);
+
+        }
+
+
+
+        .theme-toggle {
+
+            background: var(--accent-purple);
+
+            color: white;
+
+            border: none;
+
+            padding: 10px;
+
+            border-radius: 50%;
+
+            cursor: pointer;
+
+            transition: all 0.3s ease;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+        }
+
+
+
+        .theme-toggle:hover {
+
+            transform: scale(1.1);
+
+            background: var(--accent-green);
+
+        }
+
+
+
+        .stats-grid {
+
+            display: grid;
+
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+
+            gap: 20px;
+
+            margin-top: 20px;
+
+            width: 100%;
+
+        }
+
+
+
+        .stat-card {
+
+            background: #fff;
+
+            padding: 20px;
+
+            border-radius: 15px;
+
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+            text-align: center;
+
+            border: 2px solid transparent;
+
+        }
+
+
+
+        [data-theme="dark"] .stat-card {
+
+            background: #2a2a2a;
+
+            border-color: #FFD700;
+
+        }
+
+
+
+        .stat-card:hover {
+
+            transform: translateY(-5px);
+
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.1);
+
+        }
+
+
+
+        .stat-card h3 {
+
+            font-size: 1rem;
+
+            color: var(--text-tertiary);
+
+            margin-bottom: 5px;
+
+        }
+
+
+
+        .stat-card p {
+
+            font-size: 2rem;
+
+            font-weight: 700;
+
+        }
+
+        
+
+        .stat-card.due p { color: var(--accent-red); }
+
+        .stat-card.meetings p { color: var(--accent-orange); }
+
+        .stat-card.calls p { color: var(--accent-blue); }
+
+        .stat-card.active p { color: var(--accent-green); }
+
+        .stat-card.won p { color: var(--accent-purple); }
+
+        .stat-card.quotations p { color: #FFD700; }
+
+
+
+        .dashboard-content {
+
+            display: flex;
+
+            gap: 20px;
+
+            flex-wrap: wrap;
+
+            margin-bottom: 30px;
+
+        }
+
+
+
+        .client-list {
+
+            background: var(--bg-card);
+
+            backdrop-filter: blur(10px);
+
+            border-radius: 20px;
+
+            padding: 20px;
+
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.1);
+
+            flex: 2;
+
+            min-width: 600px;
+
+            border: 2px solid transparent;
+
+        }
+
+
+
+        [data-theme="dark"] .client-list {
+
+            border-color: #FFD700;
+
+        }
+
+
+
+        .todo-section {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 20px;
+
+            flex: 1;
+
+            min-width: 300px;
+
+        }
+
+
+
+        .todo-list {
+
+            background: var(--bg-card);
+
+            backdrop-filter: blur(10px);
+
+            border-radius: 20px;
+
+            padding: 20px;
+
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.1);
+
+            border: 2px solid transparent;
+
+        }
+
+
+
+        [data-theme="dark"] .todo-list {
+
+            border-color: #FFD700;
+
+        }
+
+
+
+        .todo-list.hamdi {
+
+            border-left: 5px solid var(--accent-purple);
+
+        }
+
+
+
+        .todo-list.dina {
+
+            border-left: 5px solid var(--accent-green);
+
+        }
+
+
+
+        .todo-list h2, .client-list h2 {
+
+            font-size: 1.5rem;
+
+            margin-bottom: 20px;
+
+            color: var(--text-primary);
+
+        }
+
+
+
+        .task-item {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            background: var(--hover-color);
+
+            padding: 15px;
+
+            border-radius: 10px;
+
+            margin-bottom: 10px;
+
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.03);
+
+            border-left: 5px solid;
+
+            cursor: pointer;
+
+            transition: all 0.2s ease;
+
+        }
+
+
+
+        .task-item:hover {
+
+            transform: translateX(5px);
+
+        }
+
+        
+
+        .task-item.high { border-color: var(--accent-red); }
+
+        .task-item.medium { border-color: var(--accent-orange); }
+
+        .task-item.low { border-color: var(--accent-green); }
+
+
+
+        .task-item .task-info {
+
+            flex: 1;
+
+        }
+
+        
+
+        .task-item .task-title {
+
+            font-weight: 600;
+
+            color: var(--text-primary);
+
+        }
+
+
+
+        .task-item .task-meta {
+
+            font-size: 0.85rem;
+
+            color: var(--text-tertiary);
+
+        }
+
+        
+
+        .task-item .task-actions {
+
+            display: flex;
+
+            gap: 10px;
+
+        }
+
+
+
+        .task-item button {
+
+            background: none;
+
+            border: none;
+
+            cursor: pointer;
+
+            color: var(--text-tertiary);
+
+            transition: color 0.2s ease;
+
+        }
+
+        
+
+        .task-item button:hover {
+
+            color: var(--text-primary);
+
+        }
+
+
+
+        .controls {
+
+            display: flex;
+
+            gap: 10px;
+
+            margin-bottom: 20px;
+
+            align-items: center;
+
+            flex-wrap: wrap;
+
+        }
+
+        
+
+        .controls .btn {
+
+            padding: 10px 15px;
+
+            border-radius: 10px;
+
+            border: none;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition: all 0.2s ease;
+
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+        }
+
+
+
+        .controls .btn-primary {
+
+            background-color: #6366f1;
+
+            color: #fff;
+
+        }
+
+        
+
+        .controls .btn-secondary {
+
+            background-color: #e2e8f0;
+
+            color: #4a5568;
+
+        }
+
+
+
+        [data-theme="dark"] .controls .btn-secondary {
+
+            background-color: #444;
+
+            color: #ccc;
+
+        }
+
+        
+
+        .controls .btn-secondary.small {
+
+            padding: 8px 12px;
+
+            font-size: 0.9rem;
+
+        }
+
+
+
+        .controls .btn:hover {
+
+            transform: translateY(-2px);
+
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+
+        }
+
+
+
+        .search-bar {
+
+            flex-grow: 1;
+
+            padding: 10px 15px;
+
+            border: 1px solid var(--border-color);
+
+            border-radius: 10px;
+
+            font-size: 1rem;
+
+            background: var(--bg-card);
+
+            color: var(--text-primary);
+
+        }
+
+
+
+        .sort-buttons {
+
+            display: flex;
+
+            gap: 5px;
+
+            align-items: center;
+
+        }
+
+
+
+        .sort-btn {
+
+            background: var(--accent-blue);
+
+            color: white;
+
+            border: none;
+
+            padding: 5px;
+
+            border-radius: 5px;
+
+            cursor: pointer;
+
+            transition: all 0.2s ease;
+
+        }
+
+
+
+        .sort-btn:hover {
+
+            background: var(--accent-purple);
+
+            transform: scale(1.1);
+
+        }
+
+
+
+        .client-table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+            margin-top: 20px;
+
+        }
+
+        
+
+        .client-table th, .client-table td {
+
+            padding: 15px;
+
+            text-align: left;
+
+            border-bottom: 1px solid var(--border-color);
+
+        }
+
+
+
+        .client-table th {
+
+            background: var(--hover-color);
+
+            font-weight: 600;
+
+            color: var(--text-secondary);
+
+            cursor: pointer;
+
+            white-space: nowrap;
+
+        }
+
+        
+
+        .client-table td {
+
+            background: var(--bg-card);
+
+            transition: background-color 0.2s ease;
+
+        }
+
+
+
+        .client-table tr:hover td {
+
+            background-color: var(--hover-color);
+
+            cursor: pointer;
+
+        }
+
+
+
+        .status-badge {
+
+            display: inline-block;
+
+            padding: 5px 10px;
+
+            border-radius: 20px;
+
+            font-size: 0.8rem;
+
+            font-weight: 600;
+
+            color: #fff;
+
+            text-align: center;
+
+        }
+
+
+
+        .status-badge.active { background-color: var(--accent-green); }
+
+        .status-badge.cold { background-color: #94a3b8; }
+
+        .status-badge.closed-won { background-color: var(--accent-purple); }
+
+        .status-badge.closed-lost { background-color: var(--accent-red); }
+
+
+
+        .rep-badge {
+
+            display: inline-block;
+
+            padding: 3px 8px;
+
+            border-radius: 15px;
+
+            font-size: 0.7rem;
+
+            font-weight: 600;
+
+            color: #fff;
+
+            text-align: center;
+
+        }
+
+
+
+        .rep-badge.hamdi { background-color: var(--accent-purple); }
+
+        .rep-badge.dina { background-color: var(--accent-green); }
+
+
+
+        .client-actions {
+
+            display: flex;
+
+            gap: 5px;
+
+        }
+
+
+
+        .client-actions .action-btn {
+
+            background: none;
+
+            border: none;
+
+            cursor: pointer;
+
+            color: #667eea;
+
+            opacity: 0.7;
+
+            transition: opacity 0.2s ease;
+
+        }
+
+        
+
+        .client-actions .action-btn:hover {
+
+            opacity: 1;
+
+        }
+
+
+
+        /* Modal styling */
+
+        .modal {
+
+            display: none;
+
+            position: fixed;
+
+            z-index: 1000;
+
+            left: 0;
+
+            top: 0;
+
+            width: 100%;
+
+            height: 100%;
+
+            overflow: auto;
+
+            background-color: rgba(0, 0, 0, 0.4);
+
+            backdrop-filter: blur(5px);
+
+            justify-content: center;
+
+            align-items: center;
+
+        }
+
+
+
+        .modal-content {
+
+            background-color: var(--bg-card);
+
+            padding: 30px;
+
+            border-radius: 20px;
+
+            width: 90%;
+
+            max-width: 600px;
+
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+
+            position: relative;
+
+            max-height: 80vh;
+
+            overflow-y: auto;
+
+            border: 2px solid transparent;
+
+        }
+
+
+
+        [data-theme="dark"] .modal-content {
+
+            border-color: #FFD700;
+
+        }
+
+
+
+        .modal-content h2 {
+
+            margin-bottom: 20px;
+
+            color: var(--text-primary);
+
+        }
+
+        
+
+        .close-button {
+
+            color: var(--text-tertiary);
+
+            float: right;
+
+            font-size: 28px;
+
+            font-weight: bold;
+
+            position: absolute;
+
+            top: 15px;
+
+            right: 25px;
+
+            cursor: pointer;
+
+            transition: color 0.2s ease;
+
+        }
+
+
+
+        .close-button:hover {
+
+            color: var(--text-primary);
+
+        }
+
+
+
+        .form-group {
+
+            margin-bottom: 15px;
+
+        }
+
+
+
+        .form-group label {
+
+            display: block;
+
+            margin-bottom: 5px;
+
+            font-weight: 600;
+
+            color: var(--text-primary);
+
+        }
+
+
+
+        .form-group input, .form-group select, .form-group textarea {
+
+            width: 100%;
+
+            padding: 10px;
+
+            border-radius: 8px;
+
+            border: 1px solid var(--border-color);
+
+            font-size: 1rem;
+
+            background: var(--bg-card);
+
+            color: var(--text-primary);
+
+        }
+
+
+
+        .modal-footer {
+
+            margin-top: 20px;
+
+            text-align: right;
+
+        }
+
+        
+
+        .modal-footer .btn {
+
+            padding: 10px 20px;
+
+            border-radius: 10px;
+
+            border: none;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            margin-left: 10px;
+
+        }
+
+        
+
+        .modal-footer .btn-save {
+
+            background-color: #6366f1;
+
+            color: #fff;
+
+        }
+
+
+
+        .modal-footer .btn-cancel {
+
+            background-color: #e2e8f0;
+
+            color: #4a5568;
+
+        }
+
+
+
+        [data-theme="dark"] .modal-footer .btn-cancel {
+
+            background-color: #444;
+
+            color: #ccc;
+
+        }
+
+
+
+        .message-box {
+
+            position: fixed;
+
+            bottom: 20px;
+
+            left: 50%;
+
+            transform: translateX(-50%);
+
+            padding: 15px 30px;
+
+            border-radius: 10px;
+
+            color: #fff;
+
+            font-weight: 600;
+
+            z-index: 2000;
+
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+
+            transition: opacity 0.5s ease-in-out;
+
+            opacity: 0;
+
+            pointer-events: none;
+
+        }
+
+
+
+        .message-box.visible {
+
+            opacity: 1;
+
+        }
+
+
+
+        .message-box.success { background-color: var(--accent-green); }
+
+        .message-box.error { background-color: var(--accent-red); }
+
+        .message-box.warning { background-color: var(--accent-orange); }
+
+        .message-box.info { background-color: var(--accent-blue); }
+
+
+
+        .client-details {
+
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 15px;
+
+            margin-bottom: 20px;
+
+        }
+
+
+
+        .detail-item {
+
+            background: var(--hover-color);
+
+            padding: 15px;
+
+            border-radius: 10px;
+
+            border-left: 4px solid var(--accent-blue);
+
+        }
+
+
+
+        .detail-item label {
+
+            font-weight: 600;
+
+            color: var(--text-secondary);
+
+            font-size: 0.9rem;
+
+        }
+
+
+
+        .detail-item .value {
+
+            font-size: 1.1rem;
+
+            color: var(--text-primary);
+
+            margin-top: 5px;
+
+        }
+
+
+
+        .notes-section {
+
+            margin-top: 20px;
+
+        }
+
+
+
+        .notes-section textarea {
+
+            width: 100%;
+
+            min-height: 100px;
+
+            resize: vertical;
+
+        }
+
+
+
+        @media (max-width: 768px) {
+
+            .dashboard-content {
+
+                flex-direction: column;
+
+            }
+
+            
+
+            .client-list {
+
+                min-width: auto;
+
+            }
+
+            
+
+            .todo-section {
+
+                min-width: auto;
+
+            }
+
+            
+
+            .controls {
+
+                flex-direction: column;
+
+                align-items: stretch;
+
+            }
+
+            
+
+            .search-bar {
+
+                margin-bottom: 10px;
+
+            }
+
+        }
+
+    </style>
+
 </head>
+
 <body data-theme="light">
 
-    <div class="container">
-        <!-- Header & Stats Panel -->
-        <div class="header">
-            <div class="header-left">
-                <div>
-                    <h1>Client Follow-Up Tracker</h1>
-                    <p style="color: var(--text-secondary); margin-top: 5px;">Your sales pipeline at a glance.</p>
-                </div>
-                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">
-                    <i data-lucide="moon" id="themeIcon"></i>
-                </button>
-            </div>
-            <div class="stats-grid" id="statsGrid">
-                <div class="stat-card due">
-                    <h3>Due Today</h3>
-                    <p id="statDueToday">0</p>
-                </div>
-                <div class="stat-card meetings">
-                    <h3>Meetings This Week</h3>
-                    <p id="statMeetingsThisWeek">0</p>
-                </div>
-                <div class="stat-card calls">
-                    <h3>Pending Calls</h3>
-                    <p id="statPendingCalls">0</p>
-                </div>
-                <div class="stat-card active">
-                    <h3>Active Clients</h3>
-                    <p id="statActiveClients">0</p>
-                </div>
-                <div class="stat-card won">
-                    <h3>Won This Month</h3>
-                    <p id="statWonThisMonth">0</p>
-                </div>
-                <div class="stat-card quotations">
-                    <h3>Total Quotations</h3>
-                    <p id="statTotalQuotations">0 ($0)</p>
-                </div>
-            </div>
-        </div>
 
-        <div class="dashboard-content">
-            <!-- Client List Section -->
-            <div class="client-list">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap;">
-                    <h2>Client List</h2>
-                    <div class="controls">
-                        <input type="text" id="searchClients" class="search-bar" placeholder="Search clients...">
-                        <div class="sort-buttons">
-                            <span style="font-size: 0.9rem; color: var(--text-secondary);">Sort by Follow-up:</span>
-                            <button class="sort-btn" onclick="sortByFollowUp('asc')" title="Sort Ascending">
-                                <i data-lucide="arrow-up" style="width:14px;height:14px;"></i>
-                            </button>
-                            <button class="sort-btn" onclick="sortByFollowUp('desc')" title="Sort Descending">
-                                <i data-lucide="arrow-down" style="width:14px;height:14px;"></i>
-                            </button>
-                        </div>
-                        <button class="btn btn-primary" onclick="openClientModal('add')">
-                            <i data-lucide="plus-circle"></i>
-                            Add New Client
-                        </button>
-                    </div>
-                </div>
-                <div style="overflow-x: auto;">
-                    <table class="client-table">
-                        <thead>
-                            <tr>
-                                <th onclick="sortTable(0)">ID <i data-lucide="chevrons-up-down" style="width:16px;"></i></th>
-                                <th onclick="sortTable(1)">Company <i data-lucide="chevrons-up-down" style="width:16px;"></i></th>
-                                <th onclick="sortTable(2)">Contact <i data-lucide="chevrons-up-down" style="width:16px;"></i></th>
-                                <th onclick="sortTable(3)">Rep <i data-lucide="chevrons-up-down" style="width:16px;"></i></th>
-                                <th onclick="sortTable(4)">Next Action <i data-lucide="chevrons-up-down" style="width:16px;"></i></th>
-                                <th onclick="sortTable(5)">Next Follow-Up <i data-lucide="chevrons-up-down" style="width:16px;"></i></th>
-                                <th onclick="sortTable(6)">Status <i data-lucide="chevrons-up-down" style="width:16px;"></i></th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="clientTableBody">
-                            <!-- Client rows will be dynamically inserted here -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            
-            <!-- To-Do Lists Section -->
-            <div class="todo-section">
-                <div class="todo-list hamdi">
-                    <h2>Hamdi's Tasks</h2>
-                    <div id="hamdiTaskList">
-                        <!-- Hamdi's tasks will be dynamically inserted here -->
-                    </div>
-                </div>
-                
-                <div class="todo-list dina">
-                    <h2>Dina's Tasks</h2>
-                    <div id="dinaTaskList">
-                        <!-- Dina's tasks will be dynamically inserted here -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Client Modal -->
-    <div id="clientModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeClientModal()">&times;</span>
-            <h2 id="modalTitle">Add New Client</h2>
-            <form id="clientForm">
-                <input type="hidden" id="clientId">
-                <div class="form-group">
-                    <label for="companyName">Company Name</label>
-                    <input type="text" id="companyName" name="CompanyName" required>
-                </div>
-                <div class="form-group">
-                    <label for="contactPerson">Contact Person</label>
-                    <input type="text" id="contactPerson" name="ContactPerson" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="Email" required>
-                </div>
-                <div class="form-group">
-                    <label for="phone">Phone</label>
-                    <input type="tel" id="phone" name="Phone">
-                </div>
-                <div class="form-group">
-                    <label for="rep">Rep</label>
-                    <select id="rep" name="Rep" required>
-                        <option value="">Select Rep</option>
-                        <option value="Hamdi">Hamdi</option>
-                        <option value="Dina">Dina</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="currentStage">Current Stage</label>
-                    <select id="currentStage" name="CurrentStage">
-                        <option value="Initial Contact">Initial Contact</option>
-                        <option value="Proposal Sent">Proposal Sent</option>
-                        <option value="Meeting Scheduled">Meeting Scheduled</option>
-                        <option value="Negotiation">Negotiation</option>
-                        <option value="Won">Won</option>
-                        <option value="Lost">Lost</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="nextAction">Next Action</label>
-                    <input type="text" id="nextAction" name="NextAction" required>
-                </div>
-                <div class="form-group">
-                    <label for="nextFollowUp">Next Follow-Up Date</label>
-                    <input type="date" id="nextFollowUp" name="NextFollowUp" required>
-                </div>
-                <div class="form-group">
-                    <label for="quotationAmount">Quotation Amount</label>
-                    <input type="number" id="quotationAmount" name="QuotationAmount" min="0" step="0.01" placeholder="0.00">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-cancel" onclick="closeClientModal()">Cancel</button>
-                    <button type="submit" class="btn btn-save">Save Client</button>
-                </div>
-            </form>
-        </div>
-    </div>
+    <div class="container">
 
-    <!-- Client Details Modal -->
-    <div id="clientDetailsModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeClientDetailsModal()">&times;</span>
-            <h2 id="detailsModalTitle">Client Details</h2>
-            <div id="clientDetailsContent">
-                <!-- Client details will be dynamically inserted here -->
-            </div>
-            <div class="notes-section">
-                <div class="form-group">
-                    <label for="clientNotes">Notes</label>
-                    <textarea id="clientNotes" placeholder="Add notes about this client..."></textarea>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="editClientFromDetails()">Edit Client</button>
-                <button type="button" class="btn btn-save" onclick="saveClientNotes()">Save Notes</button>
-                <button type="button" class="btn btn-cancel" onclick="closeClientDetailsModal()">Close</button>
-            </div>
-        </div>
-    </div>
+        <!-- Header & Stats Panel -->
 
-    <!-- Email Modal -->
-    <div id="emailModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeEmailModal()">&times;</span>
-            <h2>Select an Email Template</h2>
-            <div id="email-template-list">
-                <button class="email-template-btn" data-template="initial">Initial Contact Template</button>
-                <button class="email-template-btn" data-template="followUp">Follow-Up Template</button>
-                <button class="email-template-btn" data-template="proposal">Proposal Template</button>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-save" onclick="sendEmail()">Send Email</button>
-            </div>
-        </div>
-    </div>
+        <div class="header">
 
-    <!-- Message box for notifications -->
-    <div id="messageBox" class="message-box"></div>
+            <div class="header-left">
 
-    <script>
-        // --- Helper Functions and Initial Setup ---
-        const clientTableBody = document.getElementById('clientTableBody');
-        const clientForm = document.getElementById('clientForm');
-        const clientModal = document.getElementById('clientModal');
-        const clientDetailsModal = document.getElementById('clientDetailsModal');
-        const modalTitle = document.getElementById('modalTitle');
-        const emailModal = document.getElementById('emailModal');
-        const hamdiTaskList = document.getElementById('hamdiTaskList');
-        const dinaTaskList = document.getElementById('dinaTaskList');
-        const statsGrid = document.getElementById('statsGrid');
-        const searchInput = document.getElementById('searchClients');
-        const messageBox = document.getElementById('messageBox');
-        
-        let clients = [];
-        let editingClient = null;
-        let selectedTemplate = null;
-        let currentEmailClient = null;
-        let currentDetailsClient = null;
+                <div>
 
-        const emailTemplates = {
-            initial: {
-                subject: 'Following Up: {companyName}',
-                body: `Dear {contactPerson},%0D%0A%0D%0AIt was a pleasure speaking with you today about {clientNeeds}. As a follow-up to our conversation, I'd like to provide more information on how we can help. Attached is a brief overview of our services.%0D%0A%0D%0APlease let me know if you have any questions or would like to schedule a time to discuss further.%0D%0A%0D%0ABest regards,%0D%0A[Your Name]%0D%0A[Your Title]%0D%0A[Your Company]`
-            },
-            followUp: {
-                subject: 'Checking In: {companyName}',
-                body: `Hi {contactPerson},%0D%0A%0D%0AJust wanted to check in regarding {clientNe
+                    <h1>Client Follow-Up Tracker</h1>
+
+                    <p style="color: var(--text-secondary); margin-top: 5px;">Your sales pipeline at a glance.</p>
+
+                </div>
+
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">
+
+                    <i data-lucide="moon" id="themeIcon"></i>
+
+                </button>
+
+            </div>
+
+            <div class="stats-grid" id="statsGrid">
+
+                <div class="stat-card due">
+
+                    <h3>Due Today</h3>
+
+                    <p id="statDueToday">0</p>
+
+                </div>
+
+                <div class="stat-card meetings">
+
+                    <h3>Meetings This Week</h3>
+
+                    <p id="statMeetingsThisWeek">0</p>
+
+                </div>
+
+                <div class="stat-card calls">
+
+                    <h3>Pending Calls</h3>
+
+                    <p id="statPendingCalls">0</p>
+
+                </div>
+
+                <div class="stat-card active">
+
+                    <h3>Active Clients</h3>
+
+                    <p id="statActiveClients">0</p>
+
+                </div>
+
+                <div class="stat-card won">
+
+                    <h3>Won This Month</h3>
+
+                    <p id="statWonThisMonth">0</p>
+
+                </div>
+
+                <div class="stat-card quotations">
+
+                    <h3>Total Quotations</h3>
+
+                    <p id="statTotalQuotations">0 ($0)</p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="dashboard-content">
+
+            <!-- Client List Section -->
+
+            <div class="client-list">
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap;">
+
+                    <h2>Client List</h2>
+
+                    <div class="controls">
+
+                        <input type="text" id="searchClients" class="search-bar" placeholder="Search clients...">
+
+                        <div class="sort-buttons">
+
+                            <span style="font-size: 0.9rem; color: var(--text-secondary);">Sort by Follow-up:</span>
+
+                            <button class="sort-btn" onclick="sortByFollowUp('asc')" title="Sort Ascending">
+
+                                <i data-lucide="arrow-up" style="width:14px;height:14px;"></i>
+
+                            </button>
+
+                            <button class="sort-btn" onclick="sortByFollowUp('desc')" title="Sort Descending">
+
+                                <i data-lucide="arrow-down" style="width:14px;height:14px;"></i>
+
+                            </button>
+
+                        </div>
+
+                        <button class="btn btn-primary" onclick="openClientModal('add')">
+
+                            <i data-lucide="plus-circle"></i>
+
+                            Add New Client
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div style="overflow-x: auto;">
+
+                    <table class="client-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th onclick="sortTable(0)">ID <i data-lucide="chevrons-up-down" style="width:16px;"></i></th>
+
+                                <th onclick="sortTable(1)">Company <i data-lucide="chevrons-up-down" style="width:16px;"></i></th>
+
+                                <th onclick="sortTable(2)">Contact <i data-lucide="chevrons-up-down" style="width:16px;"></i></th>
+
+                                <th onclick="sortTable(3)">Rep <i data-lucide="chevrons-up-down" style="width:16px;"></i></th>
+
+                                <th onclick="sortTable(4)">Next Action <i data-lucide="chevrons-up-down" style="width:16px;"></i></th>
+
+                                <th onclick="sortTable(5)">Next Follow-Up <i data-lucide="chevrons-up-down" style="width:16px;"></i></th>
+
+                                <th onclick="sortTable(6)">Status <i data-lucide="chevrons-up-down" style="width:16px;"></i></th>
+
+                                <th>Actions</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="clientTableBody">
+
+                            <!-- Client rows will be dynamically inserted here -->
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+            
+
+            <!-- To-Do Lists Section -->
+
+            <div class="todo-section">
+
+                <div class="todo-list hamdi">
+
+                    <h2>Hamdi's Tasks</h2>
+
+                    <div id="hamdiTaskList">
+
+                        <!-- Hamdi's tasks will be dynamically inserted here -->
+
+                    </div>
+
+                </div>
+
+                
+
+                <div class="todo-list dina">
+
+                    <h2>Dina's Tasks</h2>
+
+                    <div id="dinaTaskList">
+
+                        <!-- Dina's tasks will be dynamically inserted here -->
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Client Modal -->
+
+    <div id="clientModal" class="modal">
+
+        <div class="modal-content">
+
+            <span class="close-button" onclick="closeClientModal()">&times;</span>
+
+            <h2 id="modalTitle">Add New Client</h2>
+
+            <form id="clientForm">
+
+                <input type="hidden" id="clientId">
+
+                <div class="form-group">
+
+                    <label for="companyName">Company Name</label>
+
+                    <input type="text" id="companyName" name="CompanyName" required>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="contactPerson">Contact Person</label>
+
+                    <input type="text" id="contactPerson" name="ContactPerson" required>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="email">Email</label>
+
+                    <input type="email" id="email" name="Email" required>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="phone">Phone</label>
+
+                    <input type="tel" id="phone" name="Phone">
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="rep">Rep</label>
+
+                    <select id="rep" name="Rep" required>
+
+                        <option value="">Select Rep</option>
+
+                        <option value="Hamdi">Hamdi</option>
+
+                        <option value="Dina">Dina</option>
+
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="currentStage">Current Stage</label>
+
+                    <select id="currentStage" name="CurrentStage">
+
+                        <option value="Initial Contact">Initial Contact</option>
+
+                        <option value="Proposal Sent">Proposal Sent</option>
+
+                        <option value="Meeting Scheduled">Meeting Scheduled</option>
+
+                        <option value="Negotiation">Negotiation</option>
+
+                        <option value="Won">Won</option>
+
+                        <option value="Lost">Lost</option>
+
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="nextAction">Next Action</label>
+
+                    <input type="text" id="nextAction" name="NextAction" required>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="nextFollowUp">Next Follow-Up Date</label>
+
+                    <input type="date" id="nextFollowUp" name="NextFollowUp" required>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="quotationAmount">Quotation Amount</label>
+
+                    <input type="number" id="quotationAmount" name="QuotationAmount" min="0" step="0.01" placeholder="0.00">
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button" class="btn btn-cancel" onclick="closeClientModal()">Cancel</button>
+
+                    <button type="submit" class="btn btn-save">Save Client</button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Client Details Modal -->
+
+    <div id="clientDetailsModal" class="modal">
+
+        <div class="modal-content">
+
+            <span class="close-button" onclick="closeClientDetailsModal()">&times;</span>
+
+            <h2 id="detailsModalTitle">Client Details</h2>
+
+            <div id="clientDetailsContent">
+
+                <!-- Client details will be dynamically inserted here -->
+
+            </div>
+
+            <div class="notes-section">
+
+                <div class="form-group">
+
+                    <label for="clientNotes">Notes</label>
+
+                    <textarea id="clientNotes" placeholder="Add notes about this client..."></textarea>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button" class="btn btn-secondary" onclick="editClientFromDetails()">Edit Client</button>
+
+                <button type="button" class="btn btn-save" onclick="saveClientNotes()">Save Notes</button>
+
+                <button type="button" class="btn btn-cancel" onclick="closeClientDetailsModal()">Close</button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Email Modal -->
+
+    <div id="emailModal" class="modal">
+
+        <div class="modal-content">
+
+            <span class="close-button" onclick="closeEmailModal()">&times;</span>
+
+            <h2>Select an Email Template</h2>
+
+            <div id="email-template-list">
+
+                <button class="email-template-btn" data-template="initial">Initial Contact Template</button>
+
+                <button class="email-template-btn" data-template="followUp">Follow-Up Template</button>
+
+                <button class="email-template-btn" data-template="proposal">Proposal Template</button>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button class="btn btn-save" onclick="sendEmail()">Send Email</button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Message box for notifications -->
+
+    <div id="messageBox" class="message-box"></div>
+
+
+
+    <script>
+
+        // --- Helper Functions and Initial Setup ---
+
+        const clientTableBody = document.getElementById('clientTableBody');
+
+        const clientForm = document.getElementById('clientForm');
+
+        const clientModal = document.getElementById('clientModal');
+
+        const clientDetailsModal = document.getElementById('clientDetailsModal');
+
+        const modalTitle = document.getElementById('modalTitle');
+
+        const emailModal = document.getElementById('emailModal');
+
+        const hamdiTaskList = document.getElementById('hamdiTaskList');
+
+        const dinaTaskList = document.getElementById('dinaTaskList');
+
+        const statsGrid = document.getElementById('statsGrid');
+
+        const searchInput = document.getElementById('searchClients');
+
+        const messageBox = document.getElementById('messageBox');
+
+        
+
+        let clients = [];
+
+        let editingClient = null;
+
+        let selectedTemplate = null;
+
+        let currentEmailClient = null;
+
+        let currentDetailsClient = null;
+
+
+
+        const emailTemplates = {
+
+            initial: {
+
+                subject: 'Following Up: {companyName}',
+
+                body: `Dear {contactPerson},%0D%0A%0D%0AIt was a pleasure speaking with you today about {clientNeeds}. As a follow-up to our conversation, I'd like to provide more information on how we can help. Attached is a brief overview of our services.%0D%0A%0D%0APlease let me know if you have any questions or would like to schedule a time to discuss further.%0D%0A%0D%0ABest regards,%0D%0A[Your Name]%0D%0A[Your Title]%0D%0A[Your Company]`
+
+            },
+
+            followUp: {
+
+                subject: 'Checking In: {companyName}',
+
+                body: `Hi {contactPerson},%0D%0A%0D%0AJust wanted to check in regarding {clientNe
+
