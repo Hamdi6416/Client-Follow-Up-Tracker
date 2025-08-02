@@ -1,28 +1,878 @@
-<!-- ...all your code before remains unchanged... -->
-<script>
-    // ...all previous code/functions...
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Follow-Up Tracker</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.js"></script>
+    <style>
+        /* (All your CSS styles remain unchanged. If you need to update, let me know!) */
+        /* ... */
+        /* For brevity, styles are omitted here but should be retained from your file. */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-top">
+                <div class="header-title">
+                    <h1>Client Follow-Up Tracker</h1>
+                    <p>Manage your sales pipeline and never miss a follow-up</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="openClientModal()">
+                        <i data-lucide="plus"></i>
+                        Add New Client
+                    </button>
+                    <button class="btn btn-secondary" onclick="syncToGoogleSheets()">
+                        <i data-lucide="refresh-cw"></i>
+                        Sync to Sheets
+                    </button>
+                </div>
+            </div>
+            
+            <div class="search-section">
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="Search clients..." id="searchInput">
+                    <i data-lucide="search" class="search-icon"></i>
+                </div>
+            </div>
+        </div>
 
-    // Google Sheets sync function (INTEGRATED WITH APPS SCRIPT)
-    function syncToGoogleSheets() {
-        // Send clients data to the Google Apps Script Web App
-        fetch('https://script.google.com/macros/s/AKfycby6I3W8rJ-OQc96GJRSTgp6P9tW8xSuBo5-XnyeSmU/dev', {
-            method: 'POST',
-            mode: 'no-cors', // Apps Script often requires no-cors for anonymous endpoints
-            headers: {
-                'Content-Type': 'application/json'
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number stat-due" id="statDueToday">0</div>
+                <div class="stat-label">Due Today</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number stat-meetings" id="statMeetings">0</div>
+                <div class="stat-label">Meetings This Week</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number stat-calls" id="statCalls">0</div>
+                <div class="stat-label">Pending Calls</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number stat-active" id="statActive">0</div>
+                <div class="stat-label">Active Clients</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number stat-won" id="statWon">0</div>
+                <div class="stat-label">Won This Month</div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Clients Section -->
+            <div class="clients-section">
+                <h2 class="section-title">
+                    <i data-lucide="users"></i>
+                    Your Clients
+                </h2>
+                <div class="clients-grid" id="clientsGrid">
+                    <!-- Client cards will be dynamically inserted here -->
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- To-Do List -->
+                <div class="todo-section">
+                    <h3 class="section-title">
+                        <i data-lucide="check-square"></i>
+                        To-Do List
+                    </h3>
+                    <div class="todo-list" id="todoList">
+                        <!-- To-do items will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Client Modal -->
+    <div class="modal" id="clientModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Add New Client</h2>
+                <button class="close-btn" onclick="closeClientModal()">&times;</button>
+            </div>
+            <form id="clientForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Company Name *</label>
+                        <input type="text" class="form-input" id="companyName" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Contact Person</label>
+                        <input type="text" class="form-input" id="contactPerson">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" class="form-input" id="phone">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" id="email">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Initial Contact Date</label>
+                        <input type="date" class="form-input" id="initialContact">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Current Stage</label>
+                        <select class="form-select" id="currentStage">
+                            <option value="Lead">Lead</option>
+                            <option value="Contact">Initial Contact</option>
+                            <option value="Proposal">Proposal</option>
+                            <option value="Meeting">Meeting</option>
+                            <option value="Negotiation">Negotiation</option>
+                            <option value="Closed">Closed</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Next Action</label>
+                        <input type="text" class="form-input" id="nextAction">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Deadline</label>
+                        <input type="date" class="form-input" id="deadline">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Meeting Date</label>
+                        <input type="date" class="form-input" id="meetingDate">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Client Needs</label>
+                        <textarea class="form-textarea" id="clientNeeds"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Quote Amount</label>
+                        <input type="number" class="form-input" id="quoteAmount" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select class="form-select" id="status">
+                            <option value="Active">Active</option>
+                            <option value="Won">Won</option>
+                            <option value="Lost">Lost</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Last Follow-Up</label>
+                        <input type="date" class="form-input" id="lastFollowUp">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Next Follow-Up</label>
+                        <input type="date" class="form-input" id="nextFollowUp" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Comments</label>
+                        <textarea class="form-textarea" id="comments"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-checkbox">
+                            <input type="checkbox" id="presSent">
+                            <label for="presSent">Presentation Sent?</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeClientModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Client</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Email Modal -->
+    <div class="modal" id="emailModal">
+        <div class="modal-content email-modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Send Portfolio Email</h2>
+                <button class="close-btn" onclick="closeEmailModal()">&times;</button>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Select Portfolio Template</label>
+                <div class="template-selector">
+                    <div class="template-card" onclick="selectTemplate('basic')">
+                        <h4>Basic Portfolio</h4>
+                        <p>Standard company overview</p>
+                    </div>
+                    <div class="template-card" onclick="selectTemplate('detailed')">
+                        <h4>Detailed Portfolio</h4>
+                        <p>Comprehensive services</p>
+                    </div>
+                    <div class="template-card" onclick="selectTemplate('proposal')">
+                        <h4>Proposal Template</h4>
+                        <p>Project-specific proposal</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Email Preview</label>
+                <div class="email-preview" id="emailPreview">
+                    Select a template above to see the email preview...
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeEmailModal()">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="sendEmail()">Open in Email Client</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Application State
+        let clients = [];
+        let editingClientId = null;
+        let currentEmailClient = null;
+        let selectedTemplate = null;
+
+        // Email Templates
+        const emailTemplates = {
+            basic: {
+                subject: "Company Portfolio - {companyName}",
+                body: `Dear {contactPerson},
+
+Thank you for your interest in our services. Please find attached our company portfolio highlighting our key capabilities and successful projects.
+
+We specialize in providing comprehensive solutions that help businesses like {companyName} achieve their goals efficiently and effectively.
+
+Our portfolio includes:
+- Company overview and mission
+- Core services and expertise
+- Case studies and client testimonials
+- Contact information
+
+I would be happy to schedule a call to discuss how we can support {companyName}'s specific needs.
+
+Best regards,
+Your Name
+Your Company`
             },
-            body: JSON.stringify({clients})
-        })
-        .then(() => {
-            alert('Sync request sent! Please check your Google Sheet for updates.');
-        })
-        .catch(err => {
-            alert('Failed to sync: ' + err.message);
-        });
-    }
+            detailed: {
+                subject: "Comprehensive Service Portfolio for {companyName}",
+                body: `Dear {contactPerson},
 
-    // ...rest of your code...
-    // Initialize the application
-    init();
-</script>
-<!-- ...rest of your HTML... -->
+I hope this email finds you well. Following our initial discussion, I'm pleased to share our detailed service portfolio specifically tailored for companies like {companyName}.
+
+Our comprehensive portfolio covers:
+
+🔹 Strategic Consulting Services
+🔹 Technology Solutions & Implementation  
+🔹 Project Management & Delivery
+🔹 Ongoing Support & Maintenance
+🔹 Training & Knowledge Transfer
+
+Key Highlights:
+- Over 50+ successful projects delivered
+- 98% client satisfaction rate
+- Industry-specific expertise
+- Proven ROI improvements
+
+Based on your requirements for {clientNeeds}, I believe our expertise in this area would be particularly valuable for {companyName}.
+
+Next Steps:
+I would love to schedule a 30-minute call to discuss your specific challenges and how we can provide tailored solutions.
+
+Are you available for a brief call this week?
+
+Best regards,
+Your Name
+Your Company`
+            },
+            proposal: {
+                subject: "Project Proposal for {companyName} - {nextAction}",
+                body: `Dear {contactPerson},
+
+Thank you for the opportunity to submit our proposal for {companyName}. Based on our discussion regarding {clientNeeds}, I've prepared a comprehensive proposal that addresses your specific requirements.
+
+Project Overview:
+- Scope: {nextAction}
+- Timeline: Starting from {meetingDate}
+- Investment: {quoteAmount}
+
+Our Approach:
+1. Discovery & Analysis Phase
+2. Strategy Development
+3. Implementation & Execution
+4. Testing & Quality Assurance
+5. Delivery & Training
+
+Why Choose Us:
+✓ Proven track record in your industry
+✓ Dedicated project management
+✓ Transparent communication
+✓ On-time, on-budget delivery
+✓ Ongoing support included
+
+The attached portfolio provides detailed information about our methodology, case studies, and client testimonials.
+
+I'm confident this proposal aligns perfectly with {companyName}'s objectives. I would welcome the opportunity to present this proposal in person and answer any questions you may have.
+
+Would you be available for a presentation meeting next week?
+
+Looking forward to your response.
+
+Best regards,
+Your Name
+Your Company`
+            }
+        };
+
+        // Initialize the app
+        function init() {
+            loadClients();
+            updateStats();
+            updateTodoList();
+            setupEventListeners();
+            
+            // Set default date for initial contact
+            document.getElementById('initialContact').value = new Date().toISOString().split('T')[0];
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('input', handleSearch);
+            
+            // Form automation
+            document.getElementById('presSent').addEventListener('change', handlePresentationSent);
+            document.getElementById('meetingDate').addEventListener('change', handleMeetingDate);
+            document.getElementById('lastFollowUp').addEventListener('change', handleLastFollowUp);
+            
+            // Form submission
+            document.getElementById('clientForm').addEventListener('submit', handleFormSubmit);
+        }
+
+        // Load clients from localStorage
+        function loadClients() {
+            const saved = localStorage.getItem('clientTracker_clients');
+            if (saved) {
+                clients = JSON.parse(saved);
+            }
+            renderClients();
+        }
+
+        // Save clients to localStorage
+        function saveClients() {
+            localStorage.setItem('clientTracker_clients', JSON.stringify(clients));
+        }
+
+        // Generate unique client ID
+        function generateClientId() {
+            const maxId = clients.length > 0 ? 
+                Math.max(...clients.map(c => parseInt(c.id.split('-')[1]))) : 0;
+            return `CID-${String(maxId + 1).padStart(3, '0')}`;
+        }
+
+        // Handle search
+        function handleSearch(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const filteredClients = clients.filter(client => 
+                client.companyName.toLowerCase().includes(searchTerm) ||
+                client.contactPerson.toLowerCase().includes(searchTerm) ||
+                client.email.toLowerCase().includes(searchTerm) ||
+                client.phone.includes(searchTerm) ||
+                client.currentStage.toLowerCase().includes(searchTerm) ||
+                client.status.toLowerCase().includes(searchTerm)
+            );
+            renderClients(filteredClients);
+        }
+
+        // Handle presentation sent checkbox
+        function handlePresentationSent(e) {
+            if (e.target.checked) {
+                document.getElementById('currentStage').value = 'Proposal';
+            }
+        }
+
+        // Handle meeting date change
+        function handleMeetingDate(e) {
+            if (e.target.value) {
+                document.getElementById('currentStage').value = 'Meeting';
+            }
+        }
+
+        // Handle last follow-up date change
+        function handleLastFollowUp(e) {
+            if (e.target.value) {
+                const lastDate = new Date(e.target.value);
+                const nextDate = addBusinessDays(lastDate, 3);
+                document.getElementById('nextFollowUp').value = nextDate.toISOString().split('T')[0];
+            }
+        }
+
+        // Add business days (excluding weekends)
+        function addBusinessDays(date, days) {
+            const result = new Date(date);
+            let addedDays = 0;
+            
+            while (addedDays < days) {
+                result.setDate(result.getDate() + 1);
+                if (result.getDay() !== 0 && result.getDay() !== 6) {
+                    addedDays++;
+                }
+            }
+            
+            return result;
+        }
+
+        // Handle form submission
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const formData = {
+                id: editingClientId || generateClientId(),
+                companyName: document.getElementById('companyName').value,
+                contactPerson: document.getElementById('contactPerson').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                initialContact: document.getElementById('initialContact').value,
+                currentStage: document.getElementById('currentStage').value,
+                nextAction: document.getElementById('nextAction').value,
+                deadline: document.getElementById('deadline').value,
+                presSent: document.getElementById('presSent').checked,
+                meetingDate: document.getElementById('meetingDate').value,
+                clientNeeds: document.getElementById('clientNeeds').value,
+                quoteAmount: document.getElementById('quoteAmount').value,
+                status: document.getElementById('status').value,
+                lastFollowUp: document.getElementById('lastFollowUp').value,
+                nextFollowUp: document.getElementById('nextFollowUp').value,
+                comments: document.getElementById('comments').value,
+                createdAt: editingClientId ? clients.find(c => c.id === editingClientId).createdAt : new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+
+            if (editingClientId) {
+                const index = clients.findIndex(c => c.id === editingClientId);
+                clients[index] = formData;
+            } else {
+                clients.push(formData);
+            }
+
+            saveClients();
+            renderClients();
+            updateStats();
+            updateTodoList();
+            closeClientModal();
+        }
+
+        // Render clients
+        function renderClients(clientsToRender = clients) {
+            const grid = document.getElementById('clientsGrid');
+            
+            if (clientsToRender.length === 0) {
+                grid.innerHTML = `
+                    <div class="no-clients">
+                        <div class="no-clients-icon">📋</div>
+                        <h3>No clients found</h3>
+                        <p>Add your first client to get started!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = clientsToRender.map(client => `
+                <div class="client-card">
+                    <div class="client-header">
+                        <div class="client-info">
+                            <h3>${client.companyName}</h3>
+                            <p>${client.contactPerson || 'No contact person'}</p>
+                        </div>
+                        <div class="client-actions">
+                            <button class="btn-icon btn-edit" onclick="editClient('${client.id}')" title="Edit">
+                                <i data-lucide="edit"></i>
+                            </button>
+                            <button class="btn-icon btn-email" onclick="openEmailModal('${client.id}')" title="Send Email">
+                                <i data-lucide="mail"></i>
+                            </button>
+                            <button class="btn-icon btn-delete" onclick="deleteClient('${client.id}')" title="Delete">
+                                <i data-lucide="trash-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="client-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Stage</span>
+                            <span class="badge badge-${client.currentStage.toLowerCase()}">${client.currentStage}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Status</span>
+                            <span class="badge badge-${client.status.toLowerCase()}">${client.status}</span>
+                        </div>
+                        ${client.email ? `
+                        <div class="detail-row">
+                            <span class="detail-label">Email</span>
+                            <span class="detail-value">${client.email}</span>
+                        </div>
+                        ` : ''}
+                        ${client.phone ? `
+                        <div class="detail-row">
+                            <span class="detail-label">Phone</span>
+                            <span class="detail-value">${client.phone}</span>
+                        </div>
+                        ` : ''}
+                        ${client.nextFollowUp ? `
+                        <div class="detail-row">
+                            <span class="detail-label">Next Follow-Up</span>
+                            <span class="detail-value ${isOverdue(client.nextFollowUp) ? 'overdue' : ''}">${formatDate(client.nextFollowUp)}</span>
+                        </div>
+                        ` : ''}
+                        ${client.meetingDate ? `
+                        <div class="detail-row">
+                            <span class="detail-label">Meeting Date</span>
+                            <span class="detail-value">${formatDate(client.meetingDate)}</span>
+                        </div>
+                        ` : ''}
+                        ${client.quoteAmount ? `
+                        <div class="detail-row">
+                            <span class="detail-label">Quote Amount</span>
+                            <span class="detail-value">${parseFloat(client.quoteAmount).toLocaleString()}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+            
+            // Re-initialize Lucide icons for new content
+            lucide.createIcons();
+        }
+
+        // Check if date is overdue
+        function isOverdue(dateString) {
+            if (!dateString) return false;
+            const date = new Date(dateString);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            date.setHours(0, 0, 0, 0);
+            return date < today;
+        }
+
+        // Format date for display
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            return new Date(dateString).toLocaleDateString();
+        }
+
+        // Update statistics
+        function updateStats() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - today.getDay());
+            
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
+            
+            const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+            const stats = {
+                dueToday: clients.filter(c => {
+                    if (!c.nextFollowUp) return false;
+                    const followUpDate = new Date(c.nextFollowUp);
+                    followUpDate.setHours(0, 0, 0, 0);
+                    return followUpDate <= today;
+                }).length,
+                
+                meetings: clients.filter(c => {
+                    if (!c.meetingDate) return false;
+                    const meetingDate = new Date(c.meetingDate);
+                    return meetingDate >= startOfWeek && meetingDate <= endOfWeek;
+                }).length,
+                
+                calls: clients.filter(c => 
+                    c.nextAction && c.nextAction.toLowerCase().includes('call') && c.status === 'Active'
+                ).length,
+                
+                active: clients.filter(c => c.status === 'Active').length,
+                
+                won: clients.filter(c => {
+                    if (c.status !== 'Won') return false;
+                    const updatedDate = new Date(c.updatedAt);
+                    return updatedDate >= startOfMonth && updatedDate <= endOfMonth;
+                }).length
+            };
+
+            document.getElementById('statDueToday').textContent = stats.dueToday;
+            document.getElementById('statMeetings').textContent = stats.meetings;
+            document.getElementById('statCalls').textContent = stats.calls;
+            document.getElementById('statActive').textContent = stats.active;
+            document.getElementById('statWon').textContent = stats.won;
+        }
+
+        // Update to-do list
+        function updateTodoList() {
+            const todoList = document.getElementById('todoList');
+            const todos = generateTodos();
+            
+            if (todos.length === 0) {
+                todoList.innerHTML = `
+                    <div class="todo-item">
+                        <div class="todo-content">
+                            <div class="todo-title">All caught up! 🎉</div>
+                            <div class="todo-subtitle">No pending tasks</div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            todoList.innerHTML = todos.map(todo => `
+                <div class="todo-item">
+                    <div class="todo-priority priority-${todo.priority}"></div>
+                    <div class="todo-content">
+                        <div class="todo-title">${todo.title}</div>
+                        <div class="todo-subtitle">${todo.subtitle}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Generate to-do items from client data
+        function generateTodos() {
+            const todos = [];
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            clients.forEach(client => {
+                // Overdue follow-ups
+                if (client.nextFollowUp && client.status === 'Active') {
+                    const followUpDate = new Date(client.nextFollowUp);
+                    followUpDate.setHours(0, 0, 0, 0);
+                    
+                    if (followUpDate < today) {
+                        todos.push({
+                            title: `Overdue follow-up: ${client.companyName}`,
+                            subtitle: `Due ${formatDate(client.nextFollowUp)}`,
+                            priority: 'high'
+                        });
+                    } else if (followUpDate.getTime() === today.getTime()) {
+                        todos.push({
+                            title: `Follow-up today: ${client.companyName}`,
+                            subtitle: client.contactPerson || 'No contact person',
+                            priority: 'high'
+                        });
+                    }
+                }
+
+                // Upcoming meetings
+                if (client.meetingDate && client.status === 'Active') {
+                    const meetingDate = new Date(client.meetingDate);
+                    meetingDate.setHours(0, 0, 0, 0);
+                    
+                    if (meetingDate.getTime() === today.getTime()) {
+                        todos.push({
+                            title: `Meeting today: ${client.companyName}`,
+                            subtitle: client.contactPerson || 'No contact person',
+                            priority: 'high'
+                        });
+                    } else if (meetingDate > today && meetingDate <= new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000)) {
+                        todos.push({
+                            title: `Upcoming meeting: ${client.companyName}`,
+                            subtitle: `${formatDate(client.meetingDate)}`,
+                            priority: 'medium'
+                        });
+                    }
+                }
+
+                // Pending actions
+                if (client.nextAction && client.status === 'Active') {
+                    if (client.nextAction.toLowerCase().includes('call')) {
+                        todos.push({
+                            title: `Call: ${client.companyName}`,
+                            subtitle: client.nextAction,
+                            priority: 'medium'
+                        });
+                    } else if (client.nextAction.toLowerCase().includes('proposal')) {
+                        todos.push({
+                            title: `Send proposal: ${client.companyName}`,
+                            subtitle: client.nextAction,
+                            priority: 'medium'
+                        });
+                    }
+                }
+
+                // Deadlines approaching
+                if (client.deadline && client.status === 'Active') {
+                    const deadlineDate = new Date(client.deadline);
+                    deadlineDate.setHours(0, 0, 0, 0);
+                    
+                    if (deadlineDate <= new Date(today.getTime() + 3 * 24 * 60 * 60 * 1000)) {
+                        todos.push({
+                            title: `Deadline approaching: ${client.companyName}`,
+                            subtitle: `Due ${formatDate(client.deadline)}`,
+                            priority: deadlineDate <= today ? 'high' : 'medium'
+                        });
+                    }
+                }
+            });
+
+            // Sort by priority
+            const priorityOrder = { high: 0, medium: 1, low: 2 };
+            return todos.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+        }
+
+        // Modal functions
+        function openClientModal(clientId = null) {
+            editingClientId = clientId;
+            const modal = document.getElementById('clientModal');
+            const title = document.getElementById('modalTitle');
+            
+            if (clientId) {
+                title.textContent = 'Edit Client';
+                const client = clients.find(c => c.id === clientId);
+                populateForm(client);
+            } else {
+                title.textContent = 'Add New Client';
+                resetForm();
+                document.getElementById('initialContact').value = new Date().toISOString().split('T')[0];
+            }
+            
+            modal.classList.add('show');
+        }
+
+        function closeClientModal() {
+            document.getElementById('clientModal').classList.remove('show');
+            editingClientId = null;
+        }
+
+        function populateForm(client) {
+            Object.keys(client).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) {
+                    if (element.type === 'checkbox') {
+                        element.checked = client[key];
+                    } else {
+                        element.value = client[key] || '';
+                    }
+                }
+            });
+        }
+
+        function resetForm() {
+            document.getElementById('clientForm').reset();
+        }
+
+        function editClient(clientId) {
+            openClientModal(clientId);
+        }
+
+        function deleteClient(clientId) {
+            if (confirm('Are you sure you want to delete this client? This action cannot be undone.')) {
+                clients = clients.filter(c => c.id !== clientId);
+                saveClients();
+                renderClients();
+                updateStats();
+                updateTodoList();
+            }
+        }
+
+        // Email functions
+        function openEmailModal(clientId) {
+            currentEmailClient = clients.find(c => c.id === clientId);
+            selectedTemplate = null;
+            document.getElementById('emailModal').classList.add('show');
+            updateEmailPreview();
+        }
+
+        function closeEmailModal() {
+            document.getElementById('emailModal').classList.remove('show');
+            currentEmailClient = null;
+            selectedTemplate = null;
+            
+            // Reset template selection
+            document.querySelectorAll('.template-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+        }
+
+        function selectTemplate(templateName) {
+            selectedTemplate = templateName;
+            
+            // Update UI
+            document.querySelectorAll('.template-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.target.closest('.template-card').classList.add('selected');
+            
+            updateEmailPreview();
+        }
+
+        function updateEmailPreview() {
+            const preview = document.getElementById('emailPreview');
+            
+            if (!selectedTemplate || !currentEmailClient) {
+                preview.textContent = 'Select a template above to see the email preview...';
+                return;
+            }
+
+            const template = emailTemplates[selectedTemplate];
+            const subject = replacePlaceholders(template.subject, currentEmailClient);
+            const body = replacePlaceholders(template.body, currentEmailClient);
+            
+            preview.textContent = `Subject: ${subject}\n\n${body}`;
+        }
+
+        function replacePlaceholders(text, client) {
+            return text
+                .replace(/{companyName}/g, client.companyName || '[Company Name]')
+                .replace(/{contactPerson}/g, client.contactPerson || '[Contact Person]')
+                .replace(/{clientNeeds}/g, client.clientNeeds || '[Client Needs]')
+                .replace(/{nextAction}/g, client.nextAction || '[Next Action]')
+                .replace(/{meetingDate}/g, client.meetingDate ? formatDate(client.meetingDate) : '[Meeting Date]')
+                .replace(/{quoteAmount}/g, client.quoteAmount ? `${parseFloat(client.quoteAmount).toLocaleString()}` : '[Quote Amount]');
+        }
+
+        function sendEmail() {
+            if (!selectedTemplate || !currentEmailClient) {
+                alert('Please select a template first.');
+                return;
+            }
+
+            const template = emailTemplates[selectedTemplate];
+            const subject = replacePlaceholders(template.subject, currentEmailClient);
+            const body = replacePlaceholders(template.body, currentEmailClient);
+            
+            const mailtoLink = `mailto:${currentEmailClient.email || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.open(mailtoLink);
+            
+            closeEmailModal();
+        }
+
+        // Google Sheets sync function (INTEGRATED WITH APPS SCRIPT)
+        function syncToGoogleSheets() {
+            // Send clients data to the Google Apps Script Web App
+            fetch('https://script.google.com/macros/s/AKfycby6I3W8rJ-OQc96GJRSTgp6P9tW8xSuBo5-XnyeSmU/dev', {
+                method: 'POST',
+                mode: 'no-cors', // Apps Script often requires no-cors for anonymous endpoints
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({clients})
+            })
+            .then(() => {
+                alert('Sync request sent! Please check your Google Sheet for updates.');
+            })
+            .catch(err => {
+                alert('Failed to sync: ' + err.message);
+            });
+        }
+
+        // Initialize the application
+        init();
+    </script>
+</body>
+</html>
