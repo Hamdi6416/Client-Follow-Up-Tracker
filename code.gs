@@ -4,18 +4,23 @@
  */
 
 // --- CONFIGURATION ---
-// The ID of your Google Sheet. This is the long string in the URL.
+// The ID of your Google Sheet. This is the long string in the URL, not the full URL itself.
 const SPREADSHEET_ID = '1FRgLuqWN5S2N89_cyVgihZ8pnaiexHWehO493ZLjjCI';
 // The name of the sheet you want to write to.
 const SHEET_NAME = 'Sheet1';
 
 /**
  * Handles incoming POST requests from the web app.
- * This is the main function for syncing data.
+ * This is the main function for syncing data and it includes a CORS header.
  * @param {Object} e The event object from the POST request.
  * @returns {ContentService.TextOutput} A JSON response indicating success or failure.
  */
 function doPost(e) {
+  // Set the CORS header to allow requests from your web app.
+  // Replace 'https://hamdi6416.github.io' with your actual web app URL.
+  const response = ContentService.createTextOutput();
+  response.setHeader('Access-Control-Allow-Origin', '*'); // Use '*' to allow all origins during testing
+
   try {
     // Parse the JSON data sent from the web app.
     const clientData = JSON.parse(e.postData.contents);
@@ -32,26 +37,28 @@ function doPost(e) {
     writeClientsToSheet(clientData, sheet);
     
     // Return a success response to the web app.
-    return ContentService.createTextOutput(
-      JSON.stringify({ success: true, message: 'Data synced successfully.' })
-    ).setMimeType(ContentService.MimeType.JSON);
+    response.setContent(JSON.stringify({ success: true, message: 'Data synced successfully.' }));
+    response.setMimeType(ContentService.MimeType.JSON);
     
   } catch (error) {
     // If an error occurs, log it and return an error response.
     Logger.log(error);
-    return ContentService.createTextOutput(
-      JSON.stringify({ success: false, message: error.message })
-    ).setMimeType(ContentService.MimeType.JSON);
+    response.setContent(JSON.stringify({ success: false, message: error.message }));
+    response.setMimeType(ContentService.MimeType.JSON);
   }
+
+  return response;
 }
 
 /**
  * Handles incoming GET requests.
- * This function is required for web app deployment but doesn't perform syncing.
+ * This function is required for web app deployment.
  * @returns {ContentService.TextOutput} A simple welcome message.
  */
 function doGet(e) {
-  return ContentService.createTextOutput("Hello from the Apps Script backend! This endpoint is for POST requests only.");
+  const response = ContentService.createTextOutput("Hello from the Apps Script backend! This endpoint is for POST requests only.");
+  response.setHeader('Access-Control-Allow-Origin', '*');
+  return response;
 }
 
 /**
@@ -61,26 +68,24 @@ function doGet(e) {
  * @param {Sheet} sheet The Google Sheet object to write to.
  */
 function writeClientsToSheet(clients, sheet) {
+  // Define the order of the columns to match the sheet, including the new fields.
+  const headers = [
+    "ClientID", "CompanyName", "ContactPerson", "Phone", "Email", 
+    "InitialContact", "CurrentStage", "NextAction", "Deadline", 
+    "PresSent", "MeetingDate", "ClientNeeds", "QuoteAmount", 
+    "Status", "LastFollowUp", "NextFollowUp", "Comments", 
+    "Rep", "QuotationCount", "TotalQuoteAmount" 
+  ];
+  
   // Clear all content from the sheet, but keep the header row.
   const lastRow = sheet.getLastRow();
   if (lastRow > 1) {
     sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).clearContent();
   }
 
-  // Define the order of the columns to match the sheet.
-  // This is crucial for correct data mapping.
-  const headers = [
-    "ClientID", "CompanyName", "ContactPerson", "Phone", "Email", 
-    "InitialContact", "CurrentStage", "NextAction", "Deadline", 
-    "PresSent", "MeetingDate", "ClientNeeds", "QuoteAmount", 
-    "Status", "LastFollowUp", "NextFollowUp", "Comments"
-  ];
-  
   const data = clients.map(client => {
     return headers.map(header => {
       // Return the value for the corresponding header.
-      // Use client[header] to access the property dynamically.
-      // Handle potential undefined or null values.
       return client[header] !== undefined && client[header] !== null ? client[header] : '';
     });
   });
