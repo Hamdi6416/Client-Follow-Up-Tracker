@@ -1427,12 +1427,14 @@ Your Company`
         }
 
         // Google Sheets sync function
-        function syncToGoogleSheets() {
-            alert('https://script.google.com/macros/s/AKfycbwM5VAW2Avn06jUCHufmceO9C-8X_RIiMdBDidJPBeWndrFga1A9ALIE2BY7TEi4cnK/exec');
-        }
+function syncToGoogleSheets() {
+    // The URL of your deployed Google Apps Script web app.
+    // Make sure this URL is correct.
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwM5VAW2Avn06jUCHufmceO9C-8X_RIiMdBDidJPBeWndrFga1A9ALIE2BY7TEi4cnK/exec';
+    
+    // Show a message to the user while syncing.
+    showMessage('Syncing data to Google Sheets...', 'bg-blue-500');
 
-        // Initialize the application
-        init();
-    </script>
-</body>
-</html>
+    // Get the client data from local storage.
+    // ... and so on ...
+}
