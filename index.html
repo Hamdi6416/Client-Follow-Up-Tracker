@@ -4,9 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Client Follow-Up Tracker</title>
-    <!-- Lucide Icons script must be loaded before your main script -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.js"></script>
     <style>
+        :root {
+            --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --bg-card: rgba(255, 255, 255, 0.95);
+            --text-primary: #333;
+            --text-secondary: #666;
+            --text-tertiary: #777;
+            --border-color: #ddd;
+            --hover-color: #f5f5f5;
+            --accent-red: #ef4444;
+            --accent-orange: #f97316;
+            --accent-blue: #3b82f6;
+            --accent-green: #22c55e;
+            --accent-purple: #a855f7;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: linear-gradient(135deg, #1a1a1a 0%, #2d1b69 100%);
+            --bg-card: rgba(30, 30, 30, 0.95);
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --text-tertiary: #aaaaaa;
+            --border-color: #444;
+            --hover-color: #333;
+            --accent-red: #ef4444;
+            --accent-orange: #f97316;
+            --accent-blue: #3b82f6;
+            --accent-green: #22c55e;
+            --accent-purple: #a855f7;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -15,9 +44,10 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--bg-primary);
             min-height: 100vh;
-            color: #333;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
         }
 
         .container {
@@ -27,7 +57,7 @@
         }
 
         .header {
-            background: rgba(255, 255, 255, 0.95);
+            background: var(--bg-card);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 30px;
@@ -37,12 +67,41 @@
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
+            border: 2px solid transparent;
+        }
+
+        [data-theme="dark"] .header {
+            border-color: #FFD700;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
 
         .header h1 {
             font-weight: 700;
             font-size: 2rem;
-            color: #333;
+            color: var(--text-primary);
+        }
+
+        .theme-toggle {
+            background: var(--accent-purple);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            background: var(--accent-green);
         }
 
         .stats-grid {
@@ -60,6 +119,12 @@
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             text-align: center;
+            border: 2px solid transparent;
+        }
+
+        [data-theme="dark"] .stat-card {
+            background: #2a2a2a;
+            border-color: #FFD700;
         }
 
         .stat-card:hover {
@@ -69,7 +134,7 @@
 
         .stat-card h3 {
             font-size: 1rem;
-            color: #777;
+            color: var(--text-tertiary);
             margin-bottom: 5px;
         }
 
@@ -78,11 +143,12 @@
             font-weight: 700;
         }
         
-        .stat-card.due p { color: #ef4444; } /* Red for Due Today */
-        .stat-card.meetings p { color: #f97316; } /* Orange for Meetings */
-        .stat-card.calls p { color: #3b82f6; } /* Blue for Pending Calls */
-        .stat-card.active p { color: #22c55e; } /* Green for Active Clients */
-        .stat-card.won p { color: #a855f7; } /* Purple for Won This Month */
+        .stat-card.due p { color: var(--accent-red); }
+        .stat-card.meetings p { color: var(--accent-orange); }
+        .stat-card.calls p { color: var(--accent-blue); }
+        .stat-card.active p { color: var(--accent-green); }
+        .stat-card.won p { color: var(--accent-purple); }
+        .stat-card.quotations p { color: #FFD700; }
 
         .dashboard-content {
             display: flex;
@@ -91,40 +157,77 @@
             margin-bottom: 30px;
         }
 
-        .client-list, .todo-list {
-            background: rgba(255, 255, 255, 0.95);
+        .client-list {
+            background: var(--bg-card);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 20px;
             box-shadow: 0 20px 30px rgba(0, 0, 0, 0.1);
-            flex: 1;
+            flex: 2;
+            min-width: 600px;
+            border: 2px solid transparent;
         }
 
-        .client-list {
-            flex-grow: 2;
+        [data-theme="dark"] .client-list {
+            border-color: #FFD700;
+        }
+
+        .todo-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .todo-list {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.1);
+            border: 2px solid transparent;
+        }
+
+        [data-theme="dark"] .todo-list {
+            border-color: #FFD700;
+        }
+
+        .todo-list.hamdi {
+            border-left: 5px solid var(--accent-purple);
+        }
+
+        .todo-list.dina {
+            border-left: 5px solid var(--accent-green);
         }
 
         .todo-list h2, .client-list h2 {
             font-size: 1.5rem;
             margin-bottom: 20px;
-            color: #333;
+            color: var(--text-primary);
         }
 
         .task-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: #f8f8f8;
+            background: var(--hover-color);
             padding: 15px;
             border-radius: 10px;
             margin-bottom: 10px;
             box-shadow: 0 5px 10px rgba(0, 0, 0, 0.03);
             border-left: 5px solid;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .task-item:hover {
+            transform: translateX(5px);
         }
         
-        .task-item.high { border-color: #ef4444; }
-        .task-item.medium { border-color: #f97316; }
-        .task-item.low { border-color: #22c55e; }
+        .task-item.high { border-color: var(--accent-red); }
+        .task-item.medium { border-color: var(--accent-orange); }
+        .task-item.low { border-color: var(--accent-green); }
 
         .task-item .task-info {
             flex: 1;
@@ -132,12 +235,12 @@
         
         .task-item .task-title {
             font-weight: 600;
-            color: #333;
+            color: var(--text-primary);
         }
 
         .task-item .task-meta {
             font-size: 0.85rem;
-            color: #777;
+            color: var(--text-tertiary);
         }
         
         .task-item .task-actions {
@@ -149,12 +252,12 @@
             background: none;
             border: none;
             cursor: pointer;
-            color: #777;
+            color: var(--text-tertiary);
             transition: color 0.2s ease;
         }
         
         .task-item button:hover {
-            color: #333;
+            color: var(--text-primary);
         }
 
         .controls {
@@ -162,6 +265,7 @@
             gap: 10px;
             margin-bottom: 20px;
             align-items: center;
+            flex-wrap: wrap;
         }
         
         .controls .btn {
@@ -170,7 +274,7 @@
             border: none;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: all 0.2s ease;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             display: flex;
             align-items: center;
@@ -186,6 +290,11 @@
             background-color: #e2e8f0;
             color: #4a5568;
         }
+
+        [data-theme="dark"] .controls .btn-secondary {
+            background-color: #444;
+            color: #ccc;
+        }
         
         .controls .btn-secondary.small {
             padding: 8px 12px;
@@ -200,9 +309,32 @@
         .search-bar {
             flex-grow: 1;
             padding: 10px 15px;
-            border: 1px solid #ccc;
+            border: 1px solid var(--border-color);
             border-radius: 10px;
             font-size: 1rem;
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .sort-buttons {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .sort-btn {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .sort-btn:hover {
+            background: var(--accent-purple);
+            transform: scale(1.1);
         }
 
         .client-table {
@@ -214,24 +346,25 @@
         .client-table th, .client-table td {
             padding: 15px;
             text-align: left;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .client-table th {
-            background: #f8f8f8;
+            background: var(--hover-color);
             font-weight: 600;
-            color: #555;
+            color: var(--text-secondary);
             cursor: pointer;
             white-space: nowrap;
         }
         
         .client-table td {
-            background: #fff;
+            background: var(--bg-card);
             transition: background-color 0.2s ease;
         }
 
         .client-table tr:hover td {
-            background-color: #f5f5f5;
+            background-color: var(--hover-color);
+            cursor: pointer;
         }
 
         .status-badge {
@@ -244,10 +377,23 @@
             text-align: center;
         }
 
-        .status-badge.active { background-color: #22c55e; }
+        .status-badge.active { background-color: var(--accent-green); }
         .status-badge.cold { background-color: #94a3b8; }
-        .status-badge.closed-won { background-color: #a855f7; }
-        .status-badge.closed-lost { background-color: #ef4444; }
+        .status-badge.closed-won { background-color: var(--accent-purple); }
+        .status-badge.closed-lost { background-color: var(--accent-red); }
+
+        .rep-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #fff;
+            text-align: center;
+        }
+
+        .rep-badge.hamdi { background-color: var(--accent-purple); }
+        .rep-badge.dina { background-color: var(--accent-green); }
 
         .client-actions {
             display: flex;
@@ -284,21 +430,29 @@
         }
 
         .modal-content {
-            background-color: #fefefe;
+            background-color: var(--bg-card);
             padding: 30px;
             border-radius: 20px;
             width: 90%;
             max-width: 600px;
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
             position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 2px solid transparent;
+        }
+
+        [data-theme="dark"] .modal-content {
+            border-color: #FFD700;
         }
 
         .modal-content h2 {
             margin-bottom: 20px;
+            color: var(--text-primary);
         }
         
         .close-button {
-            color: #aaa;
+            color: var(--text-tertiary);
             float: right;
             font-size: 28px;
             font-weight: bold;
@@ -306,6 +460,11 @@
             top: 15px;
             right: 25px;
             cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .close-button:hover {
+            color: var(--text-primary);
         }
 
         .form-group {
@@ -316,14 +475,17 @@
             display: block;
             margin-bottom: 5px;
             font-weight: 600;
+            color: var(--text-primary);
         }
 
         .form-group input, .form-group select, .form-group textarea {
             width: 100%;
             padding: 10px;
             border-radius: 8px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--border-color);
             font-size: 1rem;
+            background: var(--bg-card);
+            color: var(--text-primary);
         }
 
         .modal-footer {
@@ -337,6 +499,7 @@
             border: none;
             font-weight: 600;
             cursor: pointer;
+            margin-left: 10px;
         }
         
         .modal-footer .btn-save {
@@ -349,36 +512,11 @@
             color: #4a5568;
         }
 
-        #email-template-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        [data-theme="dark"] .modal-footer .btn-cancel {
+            background-color: #444;
+            color: #ccc;
         }
-        
-        .email-template-btn {
-            width: 100%;
-            text-align: left;
-            padding: 12px 20px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            background-color: #f9f9f9;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-        
-        .email-template-btn:hover {
-            background-color: #efefef;
-        }
-        
-        .email-template-btn.selected {
-            background-color: #6366f1;
-            color: #fff;
-        }
-        
-        .email-template-btn.selected:hover {
-            background-color: #4f46e5;
-        }
-        
+
         .message-box {
             position: fixed;
             bottom: 20px;
@@ -399,41 +537,84 @@
             opacity: 1;
         }
 
-        .instructions-list {
-            list-style-type: decimal;
-            padding-left: 20px;
-            margin-top: 20px;
+        .message-box.success { background-color: var(--accent-green); }
+        .message-box.error { background-color: var(--accent-red); }
+        .message-box.warning { background-color: var(--accent-orange); }
+        .message-box.info { background-color: var(--accent-blue); }
+
+        .client-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
             margin-bottom: 20px;
         }
-        
-        .instructions-list li {
-            margin-bottom: 10px;
-            line-height: 1.5;
-        }
-        
-        .code-block {
-            background: #f4f4f4;
+
+        .detail-item {
+            background: var(--hover-color);
             padding: 15px;
             border-radius: 10px;
-            font-family: monospace;
-            white-space: pre-wrap;
-            word-wrap: break-word;
+            border-left: 4px solid var(--accent-blue);
+        }
+
+        .detail-item label {
+            font-weight: 600;
+            color: var(--text-secondary);
             font-size: 0.9rem;
-            max-height: 300px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            margin-top: 10px;
+        }
+
+        .detail-item .value {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-top: 5px;
+        }
+
+        .notes-section {
+            margin-top: 20px;
+        }
+
+        .notes-section textarea {
+            width: 100%;
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-content {
+                flex-direction: column;
+            }
+            
+            .client-list {
+                min-width: auto;
+            }
+            
+            .todo-section {
+                min-width: auto;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-bar {
+                margin-bottom: 10px;
+            }
         }
     </style>
 </head>
-<body>
+<body data-theme="light">
 
     <div class="container">
         <!-- Header & Stats Panel -->
         <div class="header">
-            <div>
-                <h1>Client Follow-Up Tracker</h1>
-                <p style="color: #666; margin-top: 5px;">Your sales pipeline at a glance.</p>
+            <div class="header-left">
+                <div>
+                    <h1>Client Follow-Up Tracker</h1>
+                    <p style="color: var(--text-secondary); margin-top: 5px;">Your sales pipeline at a glance.</p>
+                </div>
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">
+                    <i data-lucide="moon" id="themeIcon"></i>
+                </button>
             </div>
             <div class="stats-grid" id="statsGrid">
                 <div class="stat-card due">
@@ -456,23 +637,32 @@
                     <h3>Won This Month</h3>
                     <p id="statWonThisMonth">0</p>
                 </div>
+                <div class="stat-card quotations">
+                    <h3>Total Quotations</h3>
+                    <p id="statTotalQuotations">0 ($0)</p>
+                </div>
             </div>
         </div>
 
         <div class="dashboard-content">
             <!-- Client List Section -->
             <div class="client-list">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap;">
                     <h2>Client List</h2>
                     <div class="controls">
                         <input type="text" id="searchClients" class="search-bar" placeholder="Search clients...">
+                        <div class="sort-buttons">
+                            <span style="font-size: 0.9rem; color: var(--text-secondary);">Sort by Follow-up:</span>
+                            <button class="sort-btn" onclick="sortByFollowUp('asc')" title="Sort Ascending">
+                                <i data-lucide="arrow-up" style="width:14px;height:14px;"></i>
+                            </button>
+                            <button class="sort-btn" onclick="sortByFollowUp('desc')" title="Sort Descending">
+                                <i data-lucide="arrow-down" style="width:14px;height:14px;"></i>
+                            </button>
+                        </div>
                         <button class="btn btn-primary" onclick="openClientModal('add')">
                             <i data-lucide="plus-circle"></i>
                             Add New Client
-                        </button>
-                        <button class="btn btn-secondary" onclick="openSheetsSyncModal()">
-                            <i data-lucide="refresh-cw"></i>
-                            Sync to Sheets
                         </button>
                     </div>
                 </div>
@@ -483,9 +673,10 @@
                                 <th onclick="sortTable(0)">ID <i data-lucide="chevrons-up-down" style="width:16px;"></i></th>
                                 <th onclick="sortTable(1)">Company <i data-lucide="chevrons-up-down" style="width:16px;"></i></th>
                                 <th onclick="sortTable(2)">Contact <i data-lucide="chevrons-up-down" style="width:16px;"></i></th>
-                                <th onclick="sortTable(3)">Next Action <i data-lucide="chevrons-up-down" style="width:16px;"></i></th>
-                                <th onclick="sortTable(4)">Next Follow-Up <i data-lucide="chevrons-up-down" style="width:16px;"></i></th>
-                                <th onclick="sortTable(5)">Status <i data-lucide="chevrons-up-down" style="width:16px;"></i></th>
+                                <th onclick="sortTable(3)">Rep <i data-lucide="chevrons-up-down" style="width:16px;"></i></th>
+                                <th onclick="sortTable(4)">Next Action <i data-lucide="chevrons-up-down" style="width:16px;"></i></th>
+                                <th onclick="sortTable(5)">Next Follow-Up <i data-lucide="chevrons-up-down" style="width:16px;"></i></th>
+                                <th onclick="sortTable(6)">Status <i data-lucide="chevrons-up-down" style="width:16px;"></i></th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -496,11 +687,20 @@
                 </div>
             </div>
             
-            <!-- To-Do List Section -->
-            <div class="todo-list" style="max-width: 350px;">
-                <h2>To-Do List</h2>
-                <div id="taskList">
-                    <!-- Tasks will be dynamically inserted here -->
+            <!-- To-Do Lists Section -->
+            <div class="todo-section">
+                <div class="todo-list hamdi">
+                    <h2>Hamdi's Tasks</h2>
+                    <div id="hamdiTaskList">
+                        <!-- Hamdi's tasks will be dynamically inserted here -->
+                    </div>
+                </div>
+                
+                <div class="todo-list dina">
+                    <h2>Dina's Tasks</h2>
+                    <div id="dinaTaskList">
+                        <!-- Dina's tasks will be dynamically inserted here -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -530,6 +730,14 @@
                     <input type="tel" id="phone" name="Phone">
                 </div>
                 <div class="form-group">
+                    <label for="rep">Rep</label>
+                    <select id="rep" name="Rep" required>
+                        <option value="">Select Rep</option>
+                        <option value="Hamdi">Hamdi</option>
+                        <option value="Dina">Dina</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label for="currentStage">Current Stage</label>
                     <select id="currentStage" name="CurrentStage">
                         <option value="Initial Contact">Initial Contact</option>
@@ -548,11 +756,37 @@
                     <label for="nextFollowUp">Next Follow-Up Date</label>
                     <input type="date" id="nextFollowUp" name="NextFollowUp" required>
                 </div>
+                <div class="form-group">
+                    <label for="quotationAmount">Quotation Amount</label>
+                    <input type="number" id="quotationAmount" name="QuotationAmount" min="0" step="0.01" placeholder="0.00">
+                </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-cancel" onclick="closeClientModal()">Cancel</button>
                     <button type="submit" class="btn btn-save">Save Client</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Client Details Modal -->
+    <div id="clientDetailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeClientDetailsModal()">&times;</span>
+            <h2 id="detailsModalTitle">Client Details</h2>
+            <div id="clientDetailsContent">
+                <!-- Client details will be dynamically inserted here -->
+            </div>
+            <div class="notes-section">
+                <div class="form-group">
+                    <label for="clientNotes">Notes</label>
+                    <textarea id="clientNotes" placeholder="Add notes about this client..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="editClientFromDetails()">Edit Client</button>
+                <button type="button" class="btn btn-save" onclick="saveClientNotes()">Save Notes</button>
+                <button type="button" class="btn btn-cancel" onclick="closeClientDetailsModal()">Close</button>
+            </div>
         </div>
     </div>
 
@@ -571,69 +805,6 @@
             </div>
         </div>
     </div>
-    
-    <!-- Google Sheets Sync Instructions Modal -->
-    <div id="sheetsSyncModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeSheetsSyncModal()">&times;</span>
-            <h2>Google Sheets Sync Setup</h2>
-            <p>To enable syncing, you need to set up your own Google Apps Script and deploy it as a web app. Please follow these steps:</p>
-            <ol class="instructions-list">
-                <li>Create a new Google Sheet for your client data and make sure it has the following headers in the first row: `ClientID`, `CompanyName`, `ContactPerson`, `Phone`, `Email`, `InitialContact`, `CurrentStage`, `NextAction`, `NextFollowUp`, `Status`.</li>
-                <li>Go to **Extensions > Apps Script** from your Google Sheet menu.</li>
-                <li>Copy the script below and paste it into the script editor, replacing any existing code.</li>
-                <li>**Crucially**, replace the placeholder `'YOUR_SHEET_ID_HERE'` in the script with the actual ID of your Google Sheet. The ID is the long string of characters in the middle of your Google Sheet's URL.</li>
-                <li>Save the script.</li>
-                <li>Deploy the script: Click **Deploy > New deployment**. Select `Web app` as the type. For "Execute as," choose "Me." For "Who has access," choose "Anyone." Click `Deploy`.</li>
-                <li>Copy the provided "Web app URL" after deployment is complete.</li>
-                <li>Paste this URL into the `SCRIPT_URL` variable in the `syncToGoogleSheets` function below.</li>
-                <li>Once you've done this, the "Sync to Sheets" button will be active and will sync your client data.</li>
-            </ol>
-
-            <h3>Google Apps Script Code to Copy:</h3>
-            <pre class="code-block" id="scriptCode">function doPost(e) {
-  const sheetId = 'YOUR_SHEET_ID_HERE';
-  const sheetName = 'Sheet1'; // Change this if your sheet has a different name
-  const sheet = SpreadsheetApp.openById(sheetId).getSheetByName(sheetName);
-
-  if (sheet) {
-    const data = JSON.parse(e.postData.contents);
-
-    // Clear existing content except the header row
-    if (sheet.getLastRow() > 1) {
-        sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).clearContent();
-    }
-
-    // Prepare data for appending to the sheet
-    const values = data.map(client => [
-      client.ClientID,
-      client.CompanyName,
-      client.ContactPerson,
-      client.Phone,
-      client.Email,
-      client.InitialContact,
-      client.CurrentStage,
-      client.NextAction,
-      client.NextFollowUp,
-      client.Status
-    ]);
-
-    // Append new data
-    if (values.length > 0) {
-      sheet.getRange(2, 1, values.length, values[0].length).setValues(values);
-    }
-
-    return ContentService.createTextOutput(JSON.stringify({success: true, message: 'Data synced successfully'})).setMimeType(ContentService.MimeType.JSON);
-  } else {
-    return ContentService.createTextOutput(JSON.stringify({success: false, message: 'Sheet not found'})).setMimeType(ContentService.MimeType.JSON);
-  }
-}</pre>
-            <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-                <button class="btn btn-secondary small" onclick="copyScriptCode()">Copy Script</button>
-                <button class="btn btn-primary small" onclick="closeSheetsSyncModal()">OK, I understand</button>
-            </div>
-        </div>
-    </div>
 
     <!-- Message box for notifications -->
     <div id="messageBox" class="message-box"></div>
@@ -643,10 +814,11 @@
         const clientTableBody = document.getElementById('clientTableBody');
         const clientForm = document.getElementById('clientForm');
         const clientModal = document.getElementById('clientModal');
+        const clientDetailsModal = document.getElementById('clientDetailsModal');
         const modalTitle = document.getElementById('modalTitle');
         const emailModal = document.getElementById('emailModal');
-        const sheetsSyncModal = document.getElementById('sheetsSyncModal');
-        const taskList = document.getElementById('taskList');
+        const hamdiTaskList = document.getElementById('hamdiTaskList');
+        const dinaTaskList = document.getElementById('dinaTaskList');
         const statsGrid = document.getElementById('statsGrid');
         const searchInput = document.getElementById('searchClients');
         const messageBox = document.getElementById('messageBox');
@@ -655,10 +827,7 @@
         let editingClient = null;
         let selectedTemplate = null;
         let currentEmailClient = null;
-        
-        // IMPORTANT: Replace this with your own deployed Google Apps Script URL
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwM5VAW2Avn06jUCHufmceO9C-8X_RIiMdBDidJPBeWndrFga1A9ALIE2BY7TEi4cnK/exec';
-
+        let currentDetailsClient = null;
 
         const emailTemplates = {
             initial: {
@@ -667,406 +836,4 @@
             },
             followUp: {
                 subject: 'Checking In: {companyName}',
-                body: `Hi {contactPerson},%0D%0A%0D%0AJust wanted to check in regarding {clientNeeds}. I hope everything is going well on your end. Do you have any updates for me?%0D%0A%0D%0ALooking forward to hearing from you.%0D%0A%0D%0ABest,%0D%0A[Your Name]`
-            },
-            proposal: {
-                subject: 'Proposal for {companyName}',
-                body: `Dear {contactPerson},%0D%0A%0D%0AFollowing up on our recent meeting on {meetingDate}, I have prepared a detailed proposal for you, with a quote amount of {quoteAmount}. You can find the full details in the attached document.%0D%0A%0D%0AI'm confident this will meet your needs, and I'm ready to discuss any questions you may have. Please let me know what you think of the proposal, and we can schedule a time to move forward with the next steps.%0D%0A%0D%0ABest regards,%0D%0A[Your Name]`
-            }
-        };
-        
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            const options = { year: 'numeric', month: 'short', day: 'numeric' };
-            return date.toLocaleDateString('en-US', options);
-        }
-
-        function getBusinessDays(startDate, days) {
-            const date = new Date(startDate);
-            let addedDays = 0;
-            while (addedDays < days) {
-                date.setDate(date.getDate() + 1);
-                if (date.getDay() !== 0 && date.getDay() !== 6) {
-                    addedDays++;
-                }
-            }
-            return date.toISOString().split('T')[0];
-        }
-        
-        function getClientId() {
-            const lastId = clients.length > 0 ? clients[clients.length - 1].ClientID.split('-')[1] : 0;
-            const newId = parseInt(lastId) + 1;
-            return `CID-${newId.toString().padStart(3, '0')}`;
-        }
-        
-        function showMessage(message, colorClass) {
-            messageBox.textContent = message;
-            messageBox.className = `message-box visible ${colorClass}`;
-            setTimeout(() => {
-                messageBox.className = 'message-box';
-            }, 3000);
-        }
-
-        // --- Core Application Logic ---
-        function renderClients(clientList) {
-            clientTableBody.innerHTML = '';
-            const fragment = document.createDocumentFragment();
-
-            clientList.forEach(client => {
-                const row = document.createElement('tr');
-                const statusClass = client.Status ? client.Status.replace(' ', '-').toLowerCase() : 'active';
-                
-                row.innerHTML = `
-                    <td>${client.ClientID}</td>
-                    <td>${client.CompanyName}</td>
-                    <td>${client.ContactPerson}</td>
-                    <td>${client.NextAction}</td>
-                    <td>${client.NextFollowUp ? formatDate(client.NextFollowUp) : 'N/A'}</td>
-                    <td><span class="status-badge ${statusClass}">${client.Status}</span></td>
-                    <td>
-                        <div class="client-actions">
-                            <button class="action-btn" onclick="openClientModal('edit', '${client.ClientID}')"><i data-lucide="pencil" style="width:16px;"></i></button>
-                            <button class="action-btn" onclick="openEmailModal('${client.ClientID}')"><i data-lucide="mail" style="width:16px;"></i></button>
-                            <button class="action-btn" onclick="deleteClient('${client.ClientID}')"><i data-lucide="trash-2" style="width:16px;"></i></button>
-                        </div>
-                    </td>
-                `;
-                fragment.appendChild(row);
-            });
-            
-            clientTableBody.appendChild(fragment);
-            // FIX: Only call lucide.createIcons() if the object exists
-            if (window.lucide) {
-                lucide.createIcons();
-            }
-        }
-
-        function renderStats() {
-            const today = new Date();
-            const startOfWeek = new Date(today);
-            startOfWeek.setDate(today.getDate() - today.getDay());
-            const endOfWeek = new Date(startOfWeek);
-            endOfWeek.setDate(startOfWeek.getDate() + 6);
-            
-            const dueToday = clients.filter(c => c.NextFollowUp && new Date(c.NextFollowUp).toDateString() === today.toDateString()).length;
-            const meetingsThisWeek = clients.filter(c => c.MeetingDate && new Date(c.MeetingDate) >= startOfWeek && new Date(c.MeetingDate) <= endOfWeek).length;
-            const pendingCalls = clients.filter(c => c.NextAction.toLowerCase().includes('call')).length;
-            const activeClients = clients.filter(c => c.Status === 'Active').length;
-            const wonThisMonth = clients.filter(c => c.Status === 'Closed-Won' && new Date(c.MeetingDate).getMonth() === today.getMonth()).length;
-
-            document.getElementById('statDueToday').textContent = dueToday;
-            document.getElementById('statMeetingsThisWeek').textContent = meetingsThisWeek;
-            document.getElementById('statPendingCalls').textContent = pendingCalls;
-            document.getElementById('statActiveClients').textContent = activeClients;
-            document.getElementById('statWonThisMonth').textContent = wonThisMonth;
-        }
-
-        function renderTodoList() {
-            taskList.innerHTML = '';
-            const today = new Date();
-            const tomorrow = new Date(today);
-            tomorrow.setDate(today.getDate() + 1);
-
-            const allTasks = clients.flatMap(client => {
-                const tasks = [];
-                if (client.NextFollowUp && new Date(client.NextFollowUp) <= today) {
-                    tasks.push({
-                        title: `Follow up with ${client.CompanyName}`,
-                        meta: `Due today. Next action: ${client.NextAction}`,
-                        priority: 'high',
-                        clientId: client.ClientID
-                    });
-                }
-                if (client.MeetingDate && new Date(client.MeetingDate).toDateString() === today.toDateString()) {
-                    tasks.push({
-                        title: `Meeting with ${client.CompanyName}`,
-                        meta: `Meeting today at ${new Date(client.MeetingDate).toLocaleTimeString()}`,
-                        priority: 'medium',
-                        clientId: client.ClientID
-                    });
-                }
-                if (client.NextAction.toLowerCase().includes('call')) {
-                    tasks.push({
-                        title: `Call ${client.ContactPerson} from ${client.CompanyName}`,
-                        meta: `Pending call action.`,
-                        priority: 'medium',
-                        clientId: client.ClientID
-                    });
-                }
-                return tasks;
-            });
-            
-            const sortedTasks = allTasks.sort((a, b) => {
-                const priorityOrder = { 'high': 1, 'medium': 2, 'low': 3 };
-                return priorityOrder[a.priority] - priorityOrder[b.priority];
-            });
-
-            sortedTasks.forEach(task => {
-                const taskItem = document.createElement('div');
-                taskItem.className = `task-item ${task.priority}`;
-                taskItem.innerHTML = `
-                    <div class="task-info">
-                        <div class="task-title">${task.title}</div>
-                        <div class="task-meta">${task.meta}</div>
-                    </div>
-                    <div class="task-actions">
-                        <button onclick="openClientModal('edit', '${task.clientId}')"><i data-lucide="edit" style="width:16px;"></i></button>
-                        <button onclick="deleteClient('${task.clientId}')"><i data-lucide="trash-2" style="width:16px;"></i></button>
-                    </div>
-                `;
-                taskList.appendChild(taskItem);
-            });
-            // FIX: Only call lucide.createIcons() if the object exists
-            if (window.lucide) {
-                lucide.createIcons();
-            }
-        }
-
-        function saveClients() {
-            localStorage.setItem('clients', JSON.stringify(clients));
-            renderClients(clients);
-            renderStats();
-            renderTodoList();
-        }
-
-        // --- Event Handlers ---
-        clientForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-            const formData = new FormData(clientForm);
-            const clientData = Object.fromEntries(formData.entries());
-
-            if (editingClient) {
-                Object.assign(editingClient, clientData);
-                editingClient = null;
-                showMessage('Client updated successfully!', 'bg-green-500');
-            } else {
-                const newClient = {
-                    ClientID: getClientId(),
-                    InitialContact: new Date().toISOString().split('T')[0],
-                    Status: 'Active',
-                    ...clientData
-                };
-                clients.push(newClient);
-                showMessage('Client added successfully!', 'bg-green-500');
-            }
-            saveClients();
-            closeClientModal();
-        });
-
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase();
-            const filteredClients = clients.filter(client =>
-                Object.values(client).some(value =>
-                    String(value).toLowerCase().includes(query)
-                )
-            );
-            renderClients(filteredClients);
-        });
-
-        document.querySelectorAll('.email-template-btn').forEach(button => {
-            button.addEventListener('click', () => {
-                document.querySelectorAll('.email-template-btn').forEach(btn => btn.classList.remove('selected'));
-                button.classList.add('selected');
-                selectedTemplate = button.dataset.template;
-            });
-        });
-        
-        function deleteClient(clientId) {
-            // Replaced alert with a custom message box or confirm modal in a real app
-            // For now, will use a simple confirm as before
-            if (confirm('Are you sure you want to delete this client?')) {
-                clients = clients.filter(client => client.ClientID !== clientId);
-                saveClients();
-                showMessage('Client deleted successfully!', 'bg-red-500');
-            }
-        }
-        
-        function copyScriptCode() {
-            const scriptCode = document.getElementById('scriptCode');
-            const range = document.createRange();
-            range.selectNode(scriptCode);
-            window.getSelection().removeAllRanges();
-            window.getSelection().addRange(range);
-            try {
-                document.execCommand('copy');
-                showMessage('Script code copied to clipboard!', 'bg-green-500');
-            } catch (err) {
-                showMessage('Failed to copy script code.', 'bg-red-500');
-            }
-            window.getSelection().removeAllRanges();
-        }
-
-        // --- Modal Control Functions ---
-        function openClientModal(mode, clientId = null) {
-            clientForm.reset();
-            if (mode === 'add') {
-                modalTitle.textContent = 'Add New Client';
-                editingClient = null;
-            } else if (mode === 'edit') {
-                modalTitle.textContent = 'Edit Client';
-                editingClient = clients.find(client => client.ClientID === clientId);
-                if (editingClient) {
-                    for (const key in editingClient) {
-                        const input = document.getElementById(key.charAt(0).toLowerCase() + key.slice(1));
-                        if (input) {
-                            input.value = editingClient[key];
-                        }
-                    }
-                }
-            }
-            clientModal.style.display = 'flex';
-        }
-
-        function closeClientModal() {
-            clientModal.style.display = 'none';
-        }
-
-        function openEmailModal(clientId) {
-            currentEmailClient = clients.find(client => client.ClientID === clientId);
-            if (!currentEmailClient) {
-                // Replaced alert with custom message box
-                showMessage('Client not found.', 'bg-red-500');
-                return;
-            }
-            emailModal.style.display = 'flex';
-        }
-
-        function closeEmailModal() {
-            emailModal.style.display = 'none';
-            selectedTemplate = null;
-            document.querySelectorAll('.email-template-btn').forEach(btn => btn.classList.remove('selected'));
-        }
-        
-        function openSheetsSyncModal() {
-            sheetsSyncModal.style.display = 'flex';
-        }
-        
-        function closeSheetsSyncModal() {
-            sheetsSyncModal.style.display = 'none';
-        }
-
-        function replacePlaceholders(text, client) {
-            return text
-                .replace(/{companyName}/g, client.CompanyName || '[Company Name]')
-                .replace(/{contactPerson}/g, client.ContactPerson || '[Contact Person]')
-                .replace(/{clientNeeds}/g, client.ClientNeeds || '[Client Needs]')
-                .replace(/{nextAction}/g, client.NextAction || '[Next Action]')
-                .replace(/{meetingDate}/g, client.MeetingDate ? formatDate(client.MeetingDate) : '[Meeting Date]')
-                .replace(/{quoteAmount}/g, client.QuoteAmount ? `${parseFloat(client.QuoteAmount).toLocaleString()}` : '[Quote Amount]');
-        }
-
-        function sendEmail() {
-            if (!selectedTemplate || !currentEmailClient) {
-                showMessage('Please select a template first.', 'bg-red-500');
-                return;
-            }
-
-            const template = emailTemplates[selectedTemplate];
-            const subject = replacePlaceholders(template.subject, currentEmailClient);
-            const body = replacePlaceholders(template.body, currentEmailClient);
-            
-            const mailtoLink = `mailto:${currentEmailClient.Email || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            window.open(mailtoLink);
-            
-            closeEmailModal();
-        }
-
-        // The actual sync function which will work once the user provides their own SCRIPT_URL
-        function syncToGoogleSheets() {
-            if (SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbwM5VAW2Avn06jUCHufmceO9C-8X_RIiMdBDidJPBeWndrFga1A9ALIE2BY7TEi4cnK/exec' || !SCRIPT_URL) {
-                showMessage('Please set up your Google Apps Script first. Click "Sync to Sheets" for instructions.', 'bg-yellow-500');
-                return;
-            }
-            
-            showMessage('Syncing data to Google Sheets...', 'bg-blue-500');
-            
-            let clients = JSON.parse(localStorage.getItem('clients') || '[]');
-
-            fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify(clients),
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    showMessage('Data successfully synced to Google Sheets!', 'bg-green-500');
-                } else {
-                    showMessage(`Sync failed: ${data.message}`, 'bg-red-500');
-                    console.error('Sync error:', data.message);
-                }
-            })
-            .catch(error => {
-                showMessage('An error occurred during sync.', 'bg-red-500');
-                console.error('Fetch error:', error);
-            });
-        }
-        
-        // Sort table function
-        let sortDirection = {};
-        function sortTable(n) {
-            const table = document.querySelector('.client-table');
-            const rows = Array.from(table.rows).slice(1);
-            const headers = table.querySelectorAll('th');
-            const icons = table.querySelectorAll('i[data-lucide="chevrons-up-down"]');
-            
-            // Reset icons
-            icons.forEach(icon => {
-                icon.style.transform = 'rotate(0deg)';
-                icon.style.transition = 'transform 0.2s';
-            });
-            
-            sortDirection[n] = sortDirection[n] === 'asc' ? 'desc' : 'asc';
-            
-            rows.sort((rowA, rowB) => {
-                const cellA = rowA.cells[n].textContent.trim();
-                const cellB = rowB.cells[n].textContent.trim();
-                
-                let valA = cellA;
-                let valB = cellB;
-                
-                // Numeric sort for IDs
-                if (n === 0) {
-                    valA = parseInt(cellA.replace('CID-', ''));
-                    valB = parseInt(cellB.replace('CID-', ''));
-                }
-                
-                if (valA < valB) return sortDirection[n] === 'asc' ? -1 : 1;
-                if (valA > valB) return sortDirection[n] === 'asc' ? 1 : -1;
-                return 0;
-            });
-            
-            table.tBodies[0].append(...rows);
-            
-            const currentIcon = headers[n].querySelector('i');
-            if (sortDirection[n] === 'asc') {
-                currentIcon.style.transform = 'rotate(180deg)';
-            }
-        }
-        
-        // Initialize the application
-        function init() {
-            const storedClients = localStorage.getItem('clients');
-            if (storedClients) {
-                clients = JSON.parse(storedClients);
-            }
-            renderClients(clients);
-            renderStats();
-            renderTodoList();
-            // FIX: Only call lucide.createIcons() if the object exists
-            if (window.lucide) {
-                lucide.createIcons();
-            }
-        }
-
-        init();
-    </script>
-</body>
-</html>
+                body: `Hi {contactPerson},%0D%0A%0D%0AJust wanted to check in regarding {clientNe
