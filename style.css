@@ -1,0 +1,91 @@
+:root {
+  --color-bg-light: #ffffff;
+  --color-bg-dark: #111111;
+  --color-text-light: #212121;
+  --color-text-dark: #f7e7c7;
+  --color-gold: #d4af37;
+  --color-outline: #d4af37;
+}
+
+/* Light theme */
+body[data-theme="light"] {
+  background: var(--color-bg-light);
+  color: var(--color-text-light);
+}
+
+/* Luxury dark theme */
+body[data-theme="dark"] {
+  background: var(--color-bg-dark);
+  color: var(--color-text-dark);
+}
+
+body[data-theme="dark"] .message-box {
+  background: var(--color-gold);
+  color: #111;
+  border: 2px solid var(--color-gold);
+}
+
+body[data-theme="dark"] .client-table,
+body[data-theme="dark"] input,
+body[data-theme="dark"] .modal,
+body[data-theme="dark"] .form-control {
+  background: #181818;
+  color: var(--color-text-dark);
+  border: 1px solid var(--color-outline);
+}
+
+body[data-theme="dark"] .modal {
+  border: 2px solid var(--color-gold);
+}
+
+body[data-theme="dark"] .theme-switch {
+  background: var(--color-gold);
+  color: #111;
+  border: 2px solid var(--color-gold);
+}
+
+/* Add more dark theme customizations as needed */
+
+/* Message box styles */
+.message-box {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  background: #4caf50;
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 6px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+.message-box.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.message-box.error { background: #d32f2f; }
+.message-box.warning { background: #fbc02d; color: #111; }
+.message-box.info { background: #1976d2; }
+
+.theme-switch {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  background: #eee;
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+.theme-switch:active {
+  box-shadow: 0 0 0 2px var(--color-outline);
+}
+
+/* ...rest of your styles (tables, modals, forms, etc.) ... */
