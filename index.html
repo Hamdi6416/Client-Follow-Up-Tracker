@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Client Follow-Up Tracker</title>
+    <!-- Lucide Icons script must be loaded before your main script -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.js"></script>
     <style>
         * {
@@ -631,7 +632,10 @@
             });
             
             clientTableBody.appendChild(fragment);
-            lucide.createIcons();
+            // FIX: Only call lucide.createIcons() if the object exists
+            if (window.lucide) {
+                lucide.createIcons();
+            }
         }
 
         function renderStats() {
@@ -709,7 +713,10 @@
                 `;
                 taskList.appendChild(taskItem);
             });
-            lucide.createIcons();
+            // FIX: Only call lucide.createIcons() if the object exists
+            if (window.lucide) {
+                lucide.createIcons();
+            }
         }
 
         function saveClients() {
@@ -835,17 +842,12 @@
             closeEmailModal();
         }
 
-        // --- START OF GOOGLE SHEETS SYNC CODE ---
-        // This is the updated function to sync your data.
+        // --- GOOGLE SHEETS SYNC CODE ---
         function syncToGoogleSheets() {
-            // The URL of your deployed Google Apps Script web app.
-            const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxi_YG0UdYXW5M5cpzk7-aBI485LOUNNF29nabrT8yYekCwbH_khoBOWRncTMmDZ8AM/exec';
+            const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwM5VAW2Avn06jUCHufmceO9C-8X_RIiMdBDidJPBeWndrFga1A9ALIE2BY7TEi4cnK/exec';
             
-            // Show a message to the user while syncing.
             showMessage('Syncing data to Google Sheets...', 'bg-blue-500');
 
-            // Get the client data from local storage.
-            // The data is stored as a JSON string, so we need to parse it.
             let clients = JSON.parse(localStorage.getItem('clients') || '[]');
 
             fetch(SCRIPT_URL, {
@@ -874,8 +876,7 @@
                 console.error('Fetch error:', error);
             });
         }
-        // --- END OF GOOGLE SHEETS SYNC CODE ---
-
+        
         // Sort table function
         let sortDirection = {};
         function sortTable(n) {
@@ -927,7 +928,10 @@
             renderClients(clients);
             renderStats();
             renderTodoList();
-            lucide.createIcons();
+            // FIX: Only call lucide.createIcons() if the object exists
+            if (window.lucide) {
+                lucide.createIcons();
+            }
         }
 
         init();
